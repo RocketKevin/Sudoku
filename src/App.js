@@ -92,14 +92,14 @@ class App extends React.Component {
     return (
       <div className="App">
         
-        <p>
+        <h1 id="title">
           Sudoku!
-        </p>
+        </h1>
 
         <div className="game-board">
           <Board />
         </div>
-
+        
         <button id="submit">
           Submit
         </button>

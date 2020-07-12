@@ -28,20 +28,13 @@
   color: #61dafb;
 }
 
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
-}
-
-.side {
-  float: left;
-}
-
-.gameBoard {
+#title {
+  border-style: groove;
+  background-color: white;
+  width: max-content;
+  padding: 10px;
   margin: 0 auto;
-  /*border: 10px solid black;*/
-  padding-left: 35%;
+  margin-top: 25px;
 }
 
 .square {
@@ -59,6 +52,12 @@
   width: 34px;
 }
 
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
 .square:focus {
   outline: none;
 }
@@ -67,6 +66,20 @@
   background: #ddd;
 }
 
+.side {
+  float: left;
+}
+
+.gameBoard {
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+
+#submit {
+  margin-top: 25px;
+}
 
 @keyframes App-logo-spin {
   from {
