@@ -67,7 +67,11 @@
 }
 
 .side {
-  float: left;
+  display: flex;
+  border-style: solid;
+  border-width: 2px;
+  margin-right: -1px;
+  margin-top: -1px;
 }
 
 .gameBoard {
