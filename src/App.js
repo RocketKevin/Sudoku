@@ -1,12 +1,6 @@
 import React from 'react';
 import './App.css';
 
-/*
-function input() {
-  let num = 0;
-
-}
-*/
 class Square extends React.Component {
   constructor(props) {
     super(props);
@@ -18,12 +12,20 @@ class Square extends React.Component {
 
     //let num = Math.floor(Math.random() * 9) + 1;
     
+    let val = this.props.inputValue;
+
+    if(this.props.inputValue === 0) {
+      val = this.state.inputValue;
+    }
+
     return (
       <input 
         type="" 
         className="square"
         maxlength="1"
-        value={this.state.inputValue}
+        value={
+          val
+        }
         onChange={event => this.setState({inputValue: event.target.value.replace(/\D/,'')})}
       >
       </input>
@@ -32,22 +34,38 @@ class Square extends React.Component {
 }
 
 class Board extends React.Component {
+
   renderSquare(i) {
-    return <Square />;
+    return <Square 
+      inputValue = {0}
+    />;
   }
 
   render() {
-
+    /*
     let oneByThree = [];
     let threeByThree = [];
     let threeByNine = [];
     let nineByNine = [];
+    */
+    let board = [];
 
+    for(let i = 0; i < 9; i++) {
+      for(let j = 0; j < 9; j++) {
+        board.push(
+          <div>
+            {this.renderSquare(i * 9 + j)}
+          </div>
+        )
+      }
+    }
+
+    /*
     //1x3 board
     for(let i = 0; i < 3; i++){
       oneByThree.push(
         <div>
-          {this.renderSquare(i)}
+          {this.renderSquare()}
         </div>
       );
     }
@@ -78,10 +96,11 @@ class Board extends React.Component {
         </div>
       );
     }
+    */
 
     return (
       <div className="gameBoard">
-        {nineByNine}
+        {board}
       </div>
     );
   }

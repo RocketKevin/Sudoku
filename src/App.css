@@ -51,13 +51,13 @@
   text-align: center;
   width: 34px;
 }
-
+/*
 .board-row:after {
   clear: both;
   content: "";
   display: table;
 }
-
+*/
 .square:focus {
   outline: none;
 }
@@ -65,7 +65,7 @@
 .kbd-navigation .square:focus {
   background: #ddd;
 }
-
+/*
 .side {
   display: flex;
   border-style: solid;
@@ -73,10 +73,11 @@
   margin-right: -1px;
   margin-top: -1px;
 }
-
+*/
 .gameBoard {
   margin-top: 25px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 34px 34px 34px 34px 34px 34px 34px 34px 34px;
   align-items: center;
   justify-content: center;
 }
