@@ -43,16 +43,38 @@ class Board extends React.Component {
     />;
   }
   /*
+  returnBlock(cell) {
+    return Math.floor(returnRow(cell) / 3) * 3 + Math.floor(returnCol(cell) / 3);
+  }
+  */
   isPossibleRow(randomNumber, y, valueBoard) {
     for(let i = 0; i < 9; i++) {
-      if (valueBoard[y * 9 + i] == randomNumber) {
+      if(valueBoard[y * 9 + i] == randomNumber) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  isPossibleCol(randomNumber, x, valueBoard) {
+    for (let i = 0; i < 9; i++) {
+      if(valueBoard[i * 9 + x] === randomNumber) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /*
+  isPossibleBlock(randomNumber, block,sudoku) {
+    for (var i=0; i<=8; i++) {
+      if (sudoku[Math.floor(block/3)*27+i%3+9*Math.floor(i/3)+3*(block%3)] == number) {
         return false;
       }
     }
     return true;
   }
   */
-
   //Return Position,  and change the reduce possible number
   number(x, y, possibleNumberBoard, valueBoard) {
     //console.log("x: " + x + ", y: " + y);
@@ -70,29 +92,15 @@ class Board extends React.Component {
       //console.log("True");
       let randomNumberOfArray = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
       
-      //let conflictRow = this.isPossibleRow(randomNumberOfArray,y,valueBoard);
+      let conflictRow = this.isPossibleRow(randomNumberOfArray, y, valueBoard);
+      let conflictCol = this.isPossibleCol(randomNumberOfArray, x, valueBoard);
       
-      //Change === to == in order to work| Cannot change both!!!
-      for(let a = x; a > 0; a--) {
-        //console.log("positionInArray: " + positionInArray);
-        //console.log("randomNumberOfArray: " + randomNumberOfArray + ", valueBoard: " + valueBoard[(y * 9 + (a - 1))]);
-        if(randomNumberOfArray == valueBoard[(y * 9 + (a - 1))]) {
-          //console.log("True1");
-          possibleNumberBoard[(y * 9 + a)].splice(randomNumberOfArray - 1,1);
-          return -1;
-        }
+      if(conflictRow && conflictCol) {
+        valueBoard[(y * 9 + x)] = [randomNumberOfArray];
+        return 0;
+      } else {
+        return -1;
       }
-      
-      //Change === to == in order to work| Cannot change both!!!
-      for(let b = y; b > 0; b--) {
-        if(randomNumberOfArray === valueBoard[((b - 1) * 9 + x)]) {
-          //console.log("True2");
-          possibleNumberBoard[(b * 9 + x)].splice(randomNumberOfArray - 1,1);
-          return -1;
-        }
-      }
-      valueBoard[(y * 9 + x)] = [randomNumberOfArray];
-      return 0;
     }
   }
 
