@@ -47,18 +47,20 @@ class Board extends React.Component {
     return Math.floor(returnRow(cell) / 3) * 3 + Math.floor(returnCol(cell) / 3);
   }
   */
-  isPossibleRow(randomNumber, y, valueBoard) {
+  isPossibleRow(randomNumber, y, valueBoard, possibleNumberBoard) {
     for(let i = 0; i < 9; i++) {
       if(valueBoard[y * 9 + i] == randomNumber) {
+        possibleNumberBoard[(y * 9 + i)].splice(randomNumber - 1,1);
         return false;
       }
     }
     return true;
   }
 
-  isPossibleCol(randomNumber, x, valueBoard) {
+  isPossibleCol(randomNumber, x, valueBoard, possibleNumberBoard) {
     for (let i = 0; i < 9; i++) {
       if(valueBoard[i * 9 + x] === randomNumber) {
+        possibleNumberBoard[(i * 9 + x)].splice(randomNumber - 1,1);
         return false;
       }
     }
@@ -92,10 +94,10 @@ class Board extends React.Component {
       //console.log("True");
       let randomNumberOfArray = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
       
-      let conflictRow = this.isPossibleRow(randomNumberOfArray, y, valueBoard);
-      let conflictCol = this.isPossibleCol(randomNumberOfArray, x, valueBoard);
+      let noConflictRow = this.isPossibleRow(randomNumberOfArray, y, valueBoard, possibleNumberBoard);
+      let noConflictCol = this.isPossibleCol(randomNumberOfArray, x, valueBoard, possibleNumberBoard);
       
-      if(conflictRow && conflictCol) {
+      if(noConflictRow && noConflictCol) {
         valueBoard[(y * 9 + x)] = [randomNumberOfArray];
         return 0;
       } else {
