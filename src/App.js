@@ -50,6 +50,8 @@ class Board extends React.Component {
   isPossibleRow(randomNumber, y, valueBoard, possibleNumberBoard) {
     for(let i = 0; i < 9; i++) {
       if(valueBoard[y * 9 + i] == randomNumber) {
+
+        //If conflicts, remove that possible number
         possibleNumberBoard[(y * 9 + i)].splice(randomNumber - 1,1);
         return false;
       }
@@ -60,6 +62,8 @@ class Board extends React.Component {
   isPossibleCol(randomNumber, x, valueBoard, possibleNumberBoard) {
     for (let i = 0; i < 9; i++) {
       if(valueBoard[i * 9 + x] === randomNumber) {
+        
+        //If conflicts, remove that possible number
         possibleNumberBoard[(i * 9 + x)].splice(randomNumber - 1,1);
         return false;
       }
@@ -83,24 +87,42 @@ class Board extends React.Component {
     //console.log("possibleNumberBoard: " + possibleNumberBoard[y * 9 + x] + ", valueBoard: " + valueBoard[y * 9 + x]);
 
     if((y * 9 + x) === 0) {
+
+      //Fill in the (0,0) of the board
       valueBoard[(y * 9 + x)] = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
       //console.log("1st: " + possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)]);
+
+      //Move forward by 1
       return 0;
     } else if(possibleNumberBoard[y * 9 + x].length === 0) {
+
+      //If there are no possble numbers left, refill
       possibleNumberBoard[y * 9 + x] = [1,2,3,4,5,6,7,8,9];
       //console.log("True");
+
+      //Move backward by 1
       return -2;
     } else {
+
       //console.log("True");
+
+      //Get a random number from array
       let randomNumberOfArray = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
       
+      //Checks for confliction for row and col
       let noConflictRow = this.isPossibleRow(randomNumberOfArray, y, valueBoard, possibleNumberBoard);
       let noConflictCol = this.isPossibleCol(randomNumberOfArray, x, valueBoard, possibleNumberBoard);
       
       if(noConflictRow && noConflictCol) {
+
+        //If no confliction use the random number
         valueBoard[(y * 9 + x)] = [randomNumberOfArray];
+
+        //Move forward by 1
         return 0;
       } else {
+
+        //If it conflicts, move backward by 1
         return -1;
       }
     }
