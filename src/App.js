@@ -12,7 +12,8 @@ class Square extends React.Component {
 
     //let num = Math.floor(Math.random() * 9) + 1;
     
-    let val = this.props.inputValue;
+    let val = this.props.displayValue;
+    //let val = num;
 
     if(this.props.inputValue === 0) {
       val = this.state.inputValue;
@@ -35,69 +36,104 @@ class Square extends React.Component {
 
 class Board extends React.Component {
 
-  renderSquare(i) {
+  renderSquare(iD, num) {
     return <Square 
-      inputValue = {0}
+      inputValue = {[1,2,3,4,5,6,7,8,9]}
+      displayValue = {num}
     />;
+  }
+  /*
+  isPossibleRow(randomNumber, y, valueBoard) {
+    for(let i = 0; i < 9; i++) {
+      if (valueBoard[y * 9 + i] == randomNumber) {
+        return false;
+      }
+    }
+    return true;
+  }
+  */
+
+  //Return Position,  and change the reduce possible number
+  number(x, y, possibleNumberBoard, valueBoard) {
+    //console.log("x: " + x + ", y: " + y);
+    //console.log("possibleNumberBoard: " + possibleNumberBoard[y * 9 + x] + ", valueBoard: " + valueBoard[y * 9 + x]);
+
+    if((y * 9 + x) === 0) {
+      valueBoard[(y * 9 + x)] = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
+      //console.log("1st: " + possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)]);
+      return 0;
+    } else if(possibleNumberBoard[y * 9 + x].length === 0) {
+      possibleNumberBoard[y * 9 + x] = [1,2,3,4,5,6,7,8,9];
+      //console.log("True");
+      return -2;
+    } else {
+      //console.log("True");
+      let randomNumberOfArray = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
+      
+      //let conflictRow = this.isPossibleRow(randomNumberOfArray,y,valueBoard);
+      
+      //Change === to == in order to work| Cannot change both!!!
+      for(let a = x; a > 0; a--) {
+        //console.log("positionInArray: " + positionInArray);
+        //console.log("randomNumberOfArray: " + randomNumberOfArray + ", valueBoard: " + valueBoard[(y * 9 + (a - 1))]);
+        if(randomNumberOfArray == valueBoard[(y * 9 + (a - 1))]) {
+          //console.log("True1");
+          possibleNumberBoard[(y * 9 + a)].splice(randomNumberOfArray - 1,1);
+          return -1;
+        }
+      }
+      
+      //Change === to == in order to work| Cannot change both!!!
+      for(let b = y; b > 0; b--) {
+        if(randomNumberOfArray === valueBoard[((b - 1) * 9 + x)]) {
+          //console.log("True2");
+          possibleNumberBoard[(b * 9 + x)].splice(randomNumberOfArray - 1,1);
+          return -1;
+        }
+      }
+      valueBoard[(y * 9 + x)] = [randomNumberOfArray];
+      return 0;
+    }
   }
 
   render() {
-    /*
-    let oneByThree = [];
-    let threeByThree = [];
-    let threeByNine = [];
-    let nineByNine = [];
-    */
-    let board = [];
 
+    let board = [];  
+    let possibleNumberBoard = [];
+    let valueBoard = [];
+
+    for(let i = 0; i < 9; i++) {
+      for(let j = 0; j < 9; j++) {
+        possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
+        valueBoard.push(0);
+      }
+    }
+
+    for(let i = 0; i < 9; i++) {
+      for(let j = 0; j < 9; j++) {
+        //console.log(j);
+        let position = this.number(j, i, possibleNumberBoard, valueBoard);
+        //console.log("position: " + position);
+        j += position;
+      }
+    }
+    /*
+    for(let i = 0; i < 9; i++) {
+      for(let j = 0; j < 9; j++) {
+        console.log((i * 9 +j) + ": " + valueBoard[(i * 9 + j)]);
+      }
+    }
+    */
     for(let i = 0; i < 9; i++) {
       for(let j = 0; j < 9; j++) {
         board.push(
           <div>
-            {this.renderSquare(i * 9 + j)}
+            {this.renderSquare((i * 9 + j), valueBoard[i * 9 + j])}
           </div>
         )
       }
     }
-
-    /*
-    //1x3 board
-    for(let i = 0; i < 3; i++){
-      oneByThree.push(
-        <div>
-          {this.renderSquare()}
-        </div>
-      );
-    }
-
-    //3x3 board
-    for(let i = 0; i < 3; i++){
-      threeByThree.push(
-        <div className="board-row">
-          {oneByThree}
-        </div>
-      );
-    }
-
-    //3x9 board
-    for(let i = 0; i < 3; i++){
-      threeByNine.push(
-        <div className="side">
-          {threeByThree}
-        </div>
-      );
-    }
-
-    //9x9 board
-    for(let i = 0; i < 3; i++){
-      nineByNine.push(
-        <div>
-          {threeByNine}
-        </div>
-      );
-    }
-    */
-
+    
     return (
       <div className="gameBoard">
         {board}
