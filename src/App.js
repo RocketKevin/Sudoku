@@ -186,7 +186,7 @@ class Board extends React.Component {
         //If j went to negative, go to last square from previous row
         if(j < 0) {
           i--;
-          j = 8;
+          j = 7;
         }
       }
     }
