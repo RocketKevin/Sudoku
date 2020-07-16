@@ -59,10 +59,12 @@ class Board extends React.Component {
   */
 
   //Check for conflict in row
-  isPossibleRow(randomNumber, y, valueBoard, possibleNumberBoard) {
-    for(let i = 0; i < 9; i++) {
+  isPossibleRow(randomNumber, x, y, valueBoard) {
+    for(let i = 0; i <= x; i++) {
       //Change === to == to work
+      console.log("valueBoard: " + valueBoard[y * 9 + i] + ", randomNumber: " + randomNumber);
       if(valueBoard[y * 9 + i] == randomNumber) {
+        console.log("True");
         return false;
       }
     }
@@ -70,10 +72,12 @@ class Board extends React.Component {
   }
   
   //Check for conflict in col
-  isPossibleCol(randomNumber, x, valueBoard) {
-    for (let i = 0; i < 9; i++) {
+  isPossibleCol(randomNumber, x, y, valueBoard) {
+    for (let i = 0; i <= y; i++) {
       //Change === to == to work
+      console.log("valueBoard: " + valueBoard[i * 9 + x] + ", randomNumber: " + randomNumber); 
       if(valueBoard[i * 9 + x] == randomNumber) {
+        console.log("True");
         return false;
       }
     }
@@ -99,21 +103,25 @@ class Board extends React.Component {
     //console.log("x: " + x + ", y: " + y);
     //console.log("possibleNumberBoard: " + possibleNumberBoard[y * 9 + x] + ", valueBoard: " + valueBoard[y * 9 + x]);
 
-    if((y * 9 + x) === 0) {
+    let position = y * 9 + x;
+
+    if(position === 0) {
 
       //Fill in the (0,0) of the board
-      valueBoard[(y * 9 + x)] = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
+      valueBoard[position] = possibleNumberBoard[position][Math.floor(Math.random() * possibleNumberBoard[position].length)];
 
       //console.log("1st: " + possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)]);
 
+      console.log("Move Forward: 0");
       //Move forward by 1
       return 1;
-    } else if(possibleNumberBoard[y * 9 + x].length === 0) {
+    } else if(possibleNumberBoard[position].length === 0) {
 
       //If there are no possble numbers left, refill
-      possibleNumberBoard[y * 9 + x] = [1,2,3,4,5,6,7,8,9];
+      possibleNumberBoard[position] = [1,2,3,4,5,6,7,8,9];
 
-      //console.log("True");
+      valueBoard[position - 1] = 0;
+      console.log("Move Back");
 
       //Move backward by 1
       return -2;
@@ -122,34 +130,38 @@ class Board extends React.Component {
       //console.log("True");
 
       //Get a random number from array
-      let randomNumberOfArray = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
+      let randomNumberOfArray = possibleNumberBoard[position][Math.floor(Math.random() * possibleNumberBoard[position].length)];
       
       //Checks for confliction for row and col
-      let noConflictRow = this.isPossibleRow(randomNumberOfArray, y, valueBoard, possibleNumberBoard);
-      let noConflictCol = this.isPossibleCol(randomNumberOfArray, x, valueBoard, possibleNumberBoard);
+      let noConflictRow = this.isPossibleRow(randomNumberOfArray, x, y, valueBoard, possibleNumberBoard);
+      let noConflictCol = this.isPossibleCol(randomNumberOfArray, x, y, valueBoard, possibleNumberBoard);
       
       if(noConflictRow && noConflictCol) {
 
         //console.log((y * 9 + x) + ": " + randomNumberOfArray);
         //If no confliction use the random number
-        valueBoard[(y * 9 + x)] = [randomNumberOfArray];
+        valueBoard[position] = [randomNumberOfArray];
 
+        console.log("Move Forward");
         //Move forward by 1
         return 0;
       } else {
 
         //If conflicts, remove that possible number
-        let indexOne = possibleNumberBoard[(y * 9 + x)].indexOf(randomNumberOfArray);
+        let indexOne = possibleNumberBoard[position].indexOf(randomNumberOfArray);
         if(indexOne >= 0) {
-          possibleNumberBoard[(y * 9 + x)].splice(indexOne,1);
+          possibleNumberBoard[position].splice(indexOne,1);
         }
 
         //If conflicts, remove that possible number
-        let indexTwo = possibleNumberBoard[(y * 9 + x)].indexOf(randomNumberOfArray);
+        let indexTwo = possibleNumberBoard[position].indexOf(randomNumberOfArray);
         if(indexTwo >= 0) {
-          possibleNumberBoard[(y * 9 + x)].splice(indexTwo,1);
+          possibleNumberBoard[position].splice(indexTwo,1);
         }
 
+        valueBoard[position] = 0;
+
+        console.log("Stay");
         //If it conflicts, stay
         return -1;
       }
@@ -182,10 +194,13 @@ class Board extends React.Component {
 
       //Get new postion of x
       let position = this.positionGenerator(x, y, possibleNumberBoard, valueBoard);
+      let precheck = i + position;
 
-      //Where x is at
-      x += position;
-      console.log("x: " + x);
+      if(precheck > 0) {
+        //Where x is at
+        i += position;
+        console.log("i: " + i);
+      }
     }
 
     //Display the true value board
