@@ -67,7 +67,9 @@ class Board extends React.Component {
 
         //If conflicts, remove that possible number
         let index = possibleNumberBoard[(y * 9 + i)].indexOf(randomNumber);
-        possibleNumberBoard[(y * 9 + i)].splice(index,1);
+        if(index > 1) {
+          possibleNumberBoard[(y * 9 + i)].splice(index,1);
+        }
         return false;
       }
     }
@@ -83,7 +85,9 @@ class Board extends React.Component {
 
         //If conflicts, remove that possible number
         let index = possibleNumberBoard[(i * 9 + x)].indexOf(randomNumber);
-        possibleNumberBoard[(i * 9 + x)].splice(index,1);
+        if(index > 1) {
+          possibleNumberBoard[(i * 9 + x)].splice(index,1);
+        }
         return false;
       }
     }
@@ -117,7 +121,7 @@ class Board extends React.Component {
       //console.log("1st: " + possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)]);
 
       //Move forward by 1
-      return 0;
+      return 1;
     } else if(possibleNumberBoard[y * 9 + x].length === 0) {
 
       //If there are no possble numbers left, refill
@@ -126,7 +130,7 @@ class Board extends React.Component {
       //console.log("True");
 
       //Move backward by 1
-      return -2;
+      return -1;
     } else {
 
       //console.log("True");
@@ -144,11 +148,11 @@ class Board extends React.Component {
         valueBoard[(y * 9 + x)] = [randomNumberOfArray];
 
         //Move forward by 1
-        return 0;
+        return 1;
       } else {
 
-        //If it conflicts, move backward by 1
-        return -1;
+        //If it conflicts, stay
+        return 0;
       }
     }
   }
@@ -170,24 +174,29 @@ class Board extends React.Component {
       valueBoard.push(0);
     }
 
+    let x = 0;
+    let y = 0;
 
-    for(let i = 0; i < 9; i++) {
-      for(let j = 0; j < 9; j++) {
-        //console.log(j);
+    for(let i = 0; i < 81; i++) {
+      if(x < 9) {
+        //Get new postion of x
+        let position = this.positionGenerator(x, y, possibleNumberBoard, valueBoard);
+        //Where x is at
+        x += position;
+        console.log("x: " + x);
 
-        //Get new postion of j
-        let position = this.positionGenerator(j, i, possibleNumberBoard, valueBoard);
-
-        //console.log("position: " + position);
-
-        //Where j is at
-        j += position;
-
-        //If j went to negative, go to last square from previous row
-        if(j < 0) {
-          i--;
-          j = 7;
-        }
+         //If j went to negative, go to last square from previous row
+        if(x < 0) {
+          console.log("True: x: " + x +  ", x: " + x);
+          if(y > 0) {
+            y--;
+          }
+          x += 8;
+          console.log("After: x: " + x + ", y: " + y);
+        } 
+      } else {
+        x = 0;
+        y++;
       }
     }
 
