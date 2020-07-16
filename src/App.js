@@ -63,10 +63,11 @@ class Board extends React.Component {
     for(let i = 0; i < 9; i++) {
 
       //Change === to == to work
-      if(valueBoard[y * 9 + i] === randomNumber) {
+      if(valueBoard[y * 9 + i] == randomNumber) {
 
         //If conflicts, remove that possible number
-        possibleNumberBoard[(y * 9 + i)].splice(randomNumber - 1,1);
+        let index = possibleNumberBoard[(y * 9 + i)].indexOf(randomNumber);
+        possibleNumberBoard[(y * 9 + i)].splice(index - 1,1);
         return false;
       }
     }
@@ -78,10 +79,11 @@ class Board extends React.Component {
     for (let i = 0; i < 9; i++) {
       
       //Change === to == to work
-      if(valueBoard[i * 9 + x] == randomNumber) {
+      if(valueBoard[i * 9 + x] === randomNumber) {
 
         //If conflicts, remove that possible number
-        possibleNumberBoard[(i * 9 + x)].splice(randomNumber - 1,1);
+        let index = possibleNumberBoard[(i * 9 + x)].indexOf(randomNumber);
+        possibleNumberBoard[(i * 9 + x)].splice(index - 1,1);
         return false;
       }
     }
@@ -174,7 +176,7 @@ class Board extends React.Component {
         //console.log(j);
 
         //Get new postion of j
-        let position = this.number(j, i, possibleNumberBoard, valueBoard);
+        let position = this.positionGenerator(j, i, possibleNumberBoard, valueBoard);
 
         //console.log("position: " + position);
 
@@ -203,7 +205,7 @@ class Board extends React.Component {
       for(let j = 0; j < 9; j++) {
         board.push(
           <div>
-            {this.renderSquare((i * 9 + j), valueBoard[i * 9 + j])}
+            {this.renderSquare(valueBoard[i * 9 + j])}
           </div>
         )
       }
