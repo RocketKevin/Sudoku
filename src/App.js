@@ -67,7 +67,7 @@ class Board extends React.Component {
 
         //If conflicts, remove that possible number
         let index = possibleNumberBoard[(y * 9 + i)].indexOf(randomNumber);
-        possibleNumberBoard[(y * 9 + i)].splice(index - 1,1);
+        possibleNumberBoard[(y * 9 + i)].splice(index,1);
         return false;
       }
     }
@@ -79,11 +79,11 @@ class Board extends React.Component {
     for (let i = 0; i < 9; i++) {
       
       //Change === to == to work
-      if(valueBoard[i * 9 + x] === randomNumber) {
+      if(valueBoard[i * 9 + x] == randomNumber) {
 
         //If conflicts, remove that possible number
         let index = possibleNumberBoard[(i * 9 + x)].indexOf(randomNumber);
-        possibleNumberBoard[(i * 9 + x)].splice(index - 1,1);
+        possibleNumberBoard[(i * 9 + x)].splice(index,1);
         return false;
       }
     }
