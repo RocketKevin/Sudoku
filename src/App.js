@@ -15,7 +15,7 @@ class Square extends React.Component {
     let val = this.props.displayValue;
 
     //If there is no value, player can enter value
-    if(this.props.inputValue === 0) {
+    if(this.props.displayValue === 0) {
       val = this.state.inputValue;
     }
 
@@ -61,15 +61,8 @@ class Board extends React.Component {
   //Check for conflict in row
   isPossibleRow(randomNumber, y, valueBoard, possibleNumberBoard) {
     for(let i = 0; i < 9; i++) {
-
       //Change === to == to work
       if(valueBoard[y * 9 + i] == randomNumber) {
-
-        //If conflicts, remove that possible number
-        let index = possibleNumberBoard[(y * 9 + i)].indexOf(randomNumber);
-        if(index > 1) {
-          possibleNumberBoard[(y * 9 + i)].splice(index,1);
-        }
         return false;
       }
     }
@@ -77,17 +70,10 @@ class Board extends React.Component {
   }
   
   //Check for conflict in col
-  isPossibleCol(randomNumber, x, valueBoard, possibleNumberBoard) {
+  isPossibleCol(randomNumber, x, valueBoard) {
     for (let i = 0; i < 9; i++) {
-      
       //Change === to == to work
       if(valueBoard[i * 9 + x] == randomNumber) {
-
-        //If conflicts, remove that possible number
-        let index = possibleNumberBoard[(i * 9 + x)].indexOf(randomNumber);
-        if(index > 1) {
-          possibleNumberBoard[(i * 9 + x)].splice(index,1);
-        }
         return false;
       }
     }
@@ -130,7 +116,7 @@ class Board extends React.Component {
       //console.log("True");
 
       //Move backward by 1
-      return -1;
+      return -2;
     } else {
 
       //console.log("True");
@@ -144,15 +130,28 @@ class Board extends React.Component {
       
       if(noConflictRow && noConflictCol) {
 
+        //console.log((y * 9 + x) + ": " + randomNumberOfArray);
         //If no confliction use the random number
         valueBoard[(y * 9 + x)] = [randomNumberOfArray];
 
         //Move forward by 1
-        return 1;
+        return 0;
       } else {
 
+        //If conflicts, remove that possible number
+        let indexOne = possibleNumberBoard[(y * 9 + x)].indexOf(randomNumberOfArray);
+        if(indexOne >= 0) {
+          possibleNumberBoard[(y * 9 + x)].splice(indexOne,1);
+        }
+
+        //If conflicts, remove that possible number
+        let indexTwo = possibleNumberBoard[(y * 9 + x)].indexOf(randomNumberOfArray);
+        if(indexTwo >= 0) {
+          possibleNumberBoard[(y * 9 + x)].splice(indexTwo,1);
+        }
+
         //If it conflicts, stay
-        return 0;
+        return -1;
       }
     }
   }
@@ -178,26 +177,15 @@ class Board extends React.Component {
     let y = 0;
 
     for(let i = 0; i < 81; i++) {
-      if(x < 9) {
-        //Get new postion of x
-        let position = this.positionGenerator(x, y, possibleNumberBoard, valueBoard);
-        //Where x is at
-        x += position;
-        console.log("x: " + x);
+      x = i % 9;
+      y = Math.floor(i/9);
 
-         //If j went to negative, go to last square from previous row
-        if(x < 0) {
-          console.log("True: x: " + x +  ", x: " + x);
-          if(y > 0) {
-            y--;
-          }
-          x += 8;
-          console.log("After: x: " + x + ", y: " + y);
-        } 
-      } else {
-        x = 0;
-        y++;
-      }
+      //Get new postion of x
+      let position = this.positionGenerator(x, y, possibleNumberBoard, valueBoard);
+
+      //Where x is at
+      x += position;
+      console.log("x: " + x);
     }
 
     //Display the true value board
