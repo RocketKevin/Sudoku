@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 
+//Making individual squares
 class Square extends React.Component {
   constructor(props) {
     super(props);
@@ -9,24 +10,31 @@ class Square extends React.Component {
     };
   }
   render() {
-
-    //let num = Math.floor(Math.random() * 9) + 1;
     
+    //Get variables from outside
     let val = this.props.displayValue;
-    //let val = num;
 
+    //If there is no value, player can enter value
     if(this.props.inputValue === 0) {
       val = this.state.inputValue;
     }
 
     return (
+
+      //Each square is an input box 
       <input 
         type="" 
         className="square"
+
+        //Only one letter, number, or character
         maxlength="1"
+
+        //Where value is kept
         value={
           val
         }
+
+        //Only number can be type
         onChange={event => this.setState({inputValue: event.target.value.replace(/\D/,'')})}
       >
       </input>
@@ -36,20 +44,26 @@ class Square extends React.Component {
 
 class Board extends React.Component {
 
-  renderSquare(iD, num) {
+  //Create a square
+  renderSquare(num) {
     return <Square 
-      inputValue = {[1,2,3,4,5,6,7,8,9]}
       displayValue = {num}
     />;
   }
+
+  //ToDo: Gives 3 by 3 block
   /*
   returnBlock(cell) {
     return Math.floor(returnRow(cell) / 3) * 3 + Math.floor(returnCol(cell) / 3);
   }
   */
+
+  //Check for conflict in row
   isPossibleRow(randomNumber, y, valueBoard, possibleNumberBoard) {
     for(let i = 0; i < 9; i++) {
-      if(valueBoard[y * 9 + i] == randomNumber) {
+
+      //Change === to == to work
+      if(valueBoard[y * 9 + i] === randomNumber) {
 
         //If conflicts, remove that possible number
         possibleNumberBoard[(y * 9 + i)].splice(randomNumber - 1,1);
@@ -58,11 +72,14 @@ class Board extends React.Component {
     }
     return true;
   }
-
+  
+  //Check for conflict in col
   isPossibleCol(randomNumber, x, valueBoard, possibleNumberBoard) {
     for (let i = 0; i < 9; i++) {
-      if(valueBoard[i * 9 + x] === randomNumber) {
-        
+      
+      //Change === to == to work
+      if(valueBoard[i * 9 + x] == randomNumber) {
+
         //If conflicts, remove that possible number
         possibleNumberBoard[(i * 9 + x)].splice(randomNumber - 1,1);
         return false;
@@ -71,6 +88,7 @@ class Board extends React.Component {
     return true;
   }
 
+  //ToDo: Checks 3 by 3 block
   /*
   isPossibleBlock(randomNumber, block,sudoku) {
     for (var i=0; i<=8; i++) {
@@ -81,8 +99,11 @@ class Board extends React.Component {
     return true;
   }
   */
-  //Return Position,  and change the reduce possible number
-  number(x, y, possibleNumberBoard, valueBoard) {
+
+  //Return position of which square currently in, either moving back, forward, or stay. 
+  //Change the possibleNumberBoard and valueBoard
+  positionGenerator(x, y, possibleNumberBoard, valueBoard) {
+
     //console.log("x: " + x + ", y: " + y);
     //console.log("possibleNumberBoard: " + possibleNumberBoard[y * 9 + x] + ", valueBoard: " + valueBoard[y * 9 + x]);
 
@@ -90,6 +111,7 @@ class Board extends React.Component {
 
       //Fill in the (0,0) of the board
       valueBoard[(y * 9 + x)] = possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)];
+
       //console.log("1st: " + possibleNumberBoard[(y * 9 + x)][Math.floor(Math.random() * possibleNumberBoard[(y * 9 + x)].length)]);
 
       //Move forward by 1
@@ -98,6 +120,7 @@ class Board extends React.Component {
 
       //If there are no possble numbers left, refill
       possibleNumberBoard[y * 9 + x] = [1,2,3,4,5,6,7,8,9];
+
       //console.log("True");
 
       //Move backward by 1
@@ -130,25 +153,43 @@ class Board extends React.Component {
 
   render() {
 
+    //For display
     let board = [];  
+
+    //Holds possible values of a square
     let possibleNumberBoard = [];
+
+    //Holds one true value
     let valueBoard = [];
 
-    for(let i = 0; i < 9; i++) {
-      for(let j = 0; j < 9; j++) {
-        possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
-        valueBoard.push(0);
-      }
+    //Give value to boards
+    for(let i = 0; i < 81; i++) {
+      possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
+      valueBoard.push(0);
     }
+
 
     for(let i = 0; i < 9; i++) {
       for(let j = 0; j < 9; j++) {
         //console.log(j);
+
+        //Get new postion of j
         let position = this.number(j, i, possibleNumberBoard, valueBoard);
+
         //console.log("position: " + position);
+
+        //Where j is at
         j += position;
+
+        //If j went to negative, go to last square from previous row
+        if(j < 0) {
+          i--;
+          j = 8;
+        }
       }
     }
+
+    //Display the true value board
     /*
     for(let i = 0; i < 9; i++) {
       for(let j = 0; j < 9; j++) {
@@ -156,6 +197,8 @@ class Board extends React.Component {
       }
     }
     */
+
+    //Store all into board
     for(let i = 0; i < 9; i++) {
       for(let j = 0; j < 9; j++) {
         board.push(
