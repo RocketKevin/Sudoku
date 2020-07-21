@@ -88,8 +88,13 @@ class Board extends React.Component {
 
   //Checks 3 by 3 block
   isPossibleBlock(randomNumber, position, valueBoard) {
+    let oneOfTheNumberInThreeByThreeBlock = 0;
+    //Iterate through the 3 by 3 block
     for (let i = 0; i < 9; i++) {
-      if (parseInt(valueBoard[Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3)]) === randomNumber) {
+      oneOfTheNumberInThreeByThreeBlock = Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3);
+      
+      //If one of the number in 3 by 3 block is the same as the random number
+      if (parseInt(valueBoard[oneOfTheNumberInThreeByThreeBlock]) === randomNumber) {
         return false;
       }
     }
@@ -109,7 +114,7 @@ class Board extends React.Component {
       valueBoard[i - 1] = 0;
 
       //Move backward by 1
-      return -2;
+      return -1;
     } else {
 
       //Get a random number from array
@@ -130,7 +135,7 @@ class Board extends React.Component {
         }
 
         //Move forward by 1
-        return 0;
+        return 1;
       } else {
 
         //If conflicts, remove that possible number
@@ -142,7 +147,7 @@ class Board extends React.Component {
         valueBoard[i] = 0;
 
         //If it conflicts, stay
-        return -1;
+        return 0;
       }
     }
   }
@@ -157,23 +162,26 @@ class Board extends React.Component {
 
     //Holds one true value
     let valueBoard = [];
+    
+    let index = 0;
 
-    for(let i = 0; i < 81; i++) {
+    while(index < 81) {
 
       possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
       valueBoard.push(0);
 
-      //Get new postion of i
-      let position = this.positionGenerator(i, possibleNumberBoard, valueBoard);
-      let precheck = i + position;
+      //Get new postion of index
+      let position = this.positionGenerator(index, possibleNumberBoard, valueBoard);
+      let precheck = index + position;
 
       if(precheck >= 0) {
 
-        //Where i is at
-        i += position;
+        //Where index is at
+        index += position;
       } else {
         break;
       }
+
     }
 
     //Store all into board
