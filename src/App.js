@@ -120,12 +120,12 @@ class Board extends React.Component {
       //Get a random number from array
       let randomNumberOfArray = possibleNumberBoard[i][Math.floor(Math.random() * possibleNumberBoard[i].length)];
       
-      //Checks for confliction for row and col
-      let noConflictRow = this.isPossibleRow(randomNumberOfArray, this.returnRow(i), valueBoard);
-      let noConflictCol = this.isPossibleCol(randomNumberOfArray, this.returnCol(i), valueBoard);
-      let noConflictBlock = this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), valueBoard);
-
-      if(noConflictRow && noConflictCol && noConflictBlock) {
+      //Checks for confliction for row, col, and block
+      if(
+        this.isPossibleRow(randomNumberOfArray, this.returnRow(i), valueBoard) && 
+        this.isPossibleCol(randomNumberOfArray, this.returnCol(i), valueBoard) && 
+        this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), valueBoard)
+      ) {
 
         //If no confliction use the random number
         valueBoard[i] = [randomNumberOfArray];
