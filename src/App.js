@@ -51,28 +51,25 @@ class Board extends React.Component {
     />;
   }
 
-  // given a sudoku cell, returns the row
-  returnRow(boardSize) {
-	  return Math.floor(boardSize / 9);
+  // given a sudoku position, returns the row
+  returnRow(position) {
+	  return Math.floor(position / 9);
   }
 
-  // given a sudoku cell, returns the column
-  returnCol(boardSize) {
-	  return boardSize % 9;
+  // given a sudoku position, returns the column
+  returnCol(position) {
+	  return position % 9;
   }
 
   //Gives 3 by 3 block
-  returnBlock(boardSize) {
-    return Math.floor(this.returnRow(boardSize) / 3) * 3 + Math.floor(this.returnCol(boardSize) / 3);
+  returnBlock(position) {
+    return Math.floor(this.returnRow(position) / 3) * 3 + Math.floor(this.returnCol(position) / 3);
   }
 
   //Check for conflict in row
   isPossibleRow(randomNumber, y, valueBoard) {
     for(let i = 0; i < 9; i++) {
-      //Change === to == to work
-      //console.log("valueBoard: " + valueBoard[y * 9 + i] + ", randomNumber: " + randomNumber);
-      if(valueBoard[y * 9 + i] == randomNumber) {
-        console.log("True");
+      if(parseInt(valueBoard[y * 9 + i]) === randomNumber) {
         return false;
       }
     }
@@ -82,10 +79,7 @@ class Board extends React.Component {
   //Check for conflict in col
   isPossibleCol(randomNumber, x, valueBoard) {
     for (let i = 0; i < 9; i++) {
-      //Change === to == to work
-      //console.log("valueBoard: " + valueBoard[i * 9 + x] + ", randomNumber: " + randomNumber); 
-      if(valueBoard[i * 9 + x] == randomNumber) {
-        console.log("True");
+      if(parseInt(valueBoard[i * 9 + x]) === randomNumber) {
         return false;
       }
     }
@@ -93,9 +87,14 @@ class Board extends React.Component {
   }
 
   //Checks 3 by 3 block
-  isPossibleBlock(randomNumber, boardSize, valueBoard) {
+  isPossibleBlock(randomNumber, position, valueBoard) {
+    let oneOfTheNumberInThreeByThreeBlock = 0;
+    //Iterate through the 3 by 3 block
     for (let i = 0; i < 9; i++) {
-      if (valueBoard[Math.floor(boardSize / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (boardSize % 3)] == randomNumber) {
+      oneOfTheNumberInThreeByThreeBlock = Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3);
+      
+      //If one of the number in 3 by 3 block is the same as the random number
+      if (parseInt(valueBoard[oneOfTheNumberInThreeByThreeBlock]) === randomNumber) {
         return false;
       }
     }
@@ -104,64 +103,51 @@ class Board extends React.Component {
 
   //Return position of which square currently in, either moving back, forward, or stay. 
   //Change the possibleNumberBoard and valueBoard
-  positionGenerator(x, y, i, possibleNumberBoard, valueBoard) {
+  positionGenerator(i, possibleNumberBoard, valueBoard) {
 
-    //console.log("x: " + x + ", y: " + y);
-    //console.log("possibleNumberBoard: " + possibleNumberBoard[y * 9 + x] + ", valueBoard: " + valueBoard[y * 9 + x]);
-
-    let position = y * 9 + x;
-
-    console.log("possibleNumberBoard: " + possibleNumberBoard[position]);
-
-    if(possibleNumberBoard[position].length === 0) {
+    if(possibleNumberBoard[i].length === 0) {
 
       //If there are no possble numbers left, refill
-      possibleNumberBoard[position] = [1,2,3,4,5,6,7,8,9];
+      possibleNumberBoard[i] = [1,2,3,4,5,6,7,8,9];
 
-      valueBoard[position] = 0;
-      valueBoard[position - 1] = 0;
-      console.log("Move Back");
+      valueBoard[i] = 0;
+      valueBoard[i - 1] = 0;
 
       //Move backward by 1
-      return -2;
+      return -1;
     } else {
 
-      //console.log("True");
-
       //Get a random number from array
-      let randomNumberOfArray = possibleNumberBoard[position][Math.floor(Math.random() * possibleNumberBoard[position].length)];
+      let randomNumberOfArray = possibleNumberBoard[i][Math.floor(Math.random() * possibleNumberBoard[i].length)];
       
-      //Checks for confliction for row and col
-      let noConflictRow = this.isPossibleRow(randomNumberOfArray, y, valueBoard);
-      let noConflictCol = this.isPossibleCol(randomNumberOfArray, x, valueBoard);
-      let noConflictBlock = this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), valueBoard);
+      //Checks for confliction for row, col, and block
+      if(
+        this.isPossibleRow(randomNumberOfArray, this.returnRow(i), valueBoard) && 
+        this.isPossibleCol(randomNumberOfArray, this.returnCol(i), valueBoard) && 
+        this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), valueBoard)
+      ) {
 
-      if(noConflictRow && noConflictCol && noConflictBlock) {
-
-        //console.log((y * 9 + x) + ": " + randomNumberOfArray);
         //If no confliction use the random number
-        valueBoard[position] = [randomNumberOfArray];
-        let index = possibleNumberBoard[position].indexOf(randomNumberOfArray);
+        valueBoard[i] = [randomNumberOfArray];
+        let index = possibleNumberBoard[i].indexOf(randomNumberOfArray);
         if(index >= 0) {
-          possibleNumberBoard[position].splice(index, 1);
+          possibleNumberBoard[i].splice(index, 1);
         }
 
-        console.log("Move Forward");
         //Move forward by 1
-        return 0;
+        return 1;
       } else {
 
         //If conflicts, remove that possible number
-        let indexOne = possibleNumberBoard[position].indexOf(randomNumberOfArray);
+        let indexOne = possibleNumberBoard[i].indexOf(randomNumberOfArray);
         if(indexOne >= 0) {
-          possibleNumberBoard[position].splice(indexOne,1);
+          possibleNumberBoard[i].splice(indexOne,1);
         }
 
-        valueBoard[position] = 0;
+        valueBoard[i] = 0;
 
-        console.log("Stay");
         //If it conflicts, stay
-        return -1;
+        return 0;
       }
     }
   }
@@ -176,41 +162,27 @@ class Board extends React.Component {
 
     //Holds one true value
     let valueBoard = [];
+    
+    let index = 0;
 
-    //Give value to boards
-    for(let i = 0; i < 81; i++) {
+    while(index < 81) {
+
       possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
       valueBoard.push(0);
-    }
 
-    let x = 0;
-    let y = 0;
-
-    for(let i = 0; i < 81; i++) {
-      x = i % 9;
-      y = Math.floor(i/9);
-
-      //Get new postion of x
-      let position = this.positionGenerator(x, y, i, possibleNumberBoard, valueBoard);
-      let precheck = i + position;
+      //Get new postion of index
+      let position = this.positionGenerator(index, possibleNumberBoard, valueBoard);
+      let precheck = index + position;
 
       if(precheck >= 0) {
-        //Where x is at
-        i += position;
-        console.log("i: " + i);
+
+        //Where index is at
+        index += position;
       } else {
         break;
       }
-    }
 
-    //Display the true value board
-    /*
-    for(let i = 0; i < 9; i++) {
-      for(let j = 0; j < 9; j++) {
-        console.log((i * 9 +j) + ": " + valueBoard[(i * 9 + j)]);
-      }
     }
-    */
 
     //Store all into board
     for(let i = 0; i < 9; i++) {
