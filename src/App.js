@@ -88,10 +88,10 @@ class Board extends React.Component {
 
   //Checks 3 by 3 block
   isPossibleBlock(randomNumber, position, valueBoard) {
-    let oneOfTheNumberInThreeByThreeBlock = 0;
+    
     //Iterate through the 3 by 3 block
     for (let i = 0; i < 9; i++) {
-      oneOfTheNumberInThreeByThreeBlock = Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3);
+      let oneOfTheNumberInThreeByThreeBlock = Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3);
       
       //If one of the number in 3 by 3 block is the same as the random number
       if (parseInt(valueBoard[oneOfTheNumberInThreeByThreeBlock]) === randomNumber) {
