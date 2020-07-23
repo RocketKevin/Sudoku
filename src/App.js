@@ -101,6 +101,91 @@ class Board extends React.Component {
     return true;
   }
 
+  //Remove a random number from the board
+  removeRandomNumber(valueBoard) {
+
+    //Pick a random position o the board
+    let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
+
+    let backup = [];
+
+    //Change the random number if the position it's on was a zero
+    while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
+      //Reset random number
+      randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
+    }
+
+    //Back up position of board's value removed and it's number
+    backup.push(randomPositionOfBoard);
+    backup.push(valueBoard[randomPositionOfBoard]);
+
+    //Set value of the random picked position to zero
+    valueBoard[randomPositionOfBoard] = 0;
+    
+    //Tell which position got their number removed and what number
+    return backup;
+  }
+
+  //Undo removeRandomNumber
+  undoRemoveRandomNumber(undo, valueBoard) {
+    //Reset the position, given from removeRandomNumber method, of the board's value
+    valueBoard[undo[0]] = undo[1];
+  }
+
+  findAllPossibleAnswers(valueBoard, backup) {
+    let allPossibleAnswers = [];
+    let oneSetOfAnswers = [];
+    for(let i = 0; i < backup.length; i++) {
+      for(let j = 1; j < 10; j++) {
+        if( this.isPossibleRow(j, this.returnRow(backup[i][0]), valueBoard) &&
+            this.isPossibleCol(j, this.returnCol(backup[i][0]), valueBoard) &&
+            this.isPossibleBlock(j, this.returnBlock(backup[i][0]), valueBoard)
+        ) {
+          oneSetOfAnswers.push(j);
+        }
+      }
+      allPossibleAnswers.push([backup[i][0], oneSetOfAnswers]);
+      oneSetOfAnswers = [];
+    }
+    return allPossibleAnswers;
+  }
+
+  /* In Progress */
+  isUnique(valueBoard, possibleNumber, backup) {
+    //console.log(possibleNumber);
+    for(let i = 0; i < possibleNumber.length; i++) {
+        if(possibleNumber[i][1].length < 1) {
+            //console.log("true");
+            //If more than one, plug in the number
+            //Solve the board
+            //If solvable return false
+        }
+    }
+    return true;
+  }
+
+  /* In Progress */
+  safelyRemoveNumbers(valueBoard) {
+    let backup = [];
+    let possibleNumbers = [];
+    let index = 0;
+    while(index < 15) {
+      //Remove number and obtain it's value and position
+      backup.push(this.removeRandomNumber(valueBoard));
+      //Find all possible answers for each cell
+      possibleNumbers = this.findAllPossibleAnswers(valueBoard, backup);
+      //Check unique 
+      if(this.isUnique(valueBoard, possibleNumbers, backup)) {
+        index++;
+      } else {
+        this.undoRemoveRandomNumber(backup[index], valueBoard);
+      }
+      console.log(backup);
+    }
+
+    return 0;
+  }
+
   //Return position of which square currently in, either moving back, forward, or stay. 
   //Change the possibleNumberBoard and valueBoard
   positionGenerator(i, possibleNumberBoard, valueBoard) {
@@ -163,12 +248,14 @@ class Board extends React.Component {
     //Holds one true value
     let valueBoard = [];
     
+    for(let i = 0; i < 81; i++) {
+      possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
+      valueBoard.push(0);
+    }
+
     let index = 0;
 
     while(index < 81) {
-
-      possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
-      valueBoard.push(0);
 
       //Get new postion of index
       let position = this.positionGenerator(index, possibleNumberBoard, valueBoard);
@@ -184,6 +271,8 @@ class Board extends React.Component {
 
     }
 
+    this.safelyRemoveNumbers(valueBoard);
+    
     //Store all into board
     for(let i = 0; i < 9; i++) {
       for(let j = 0; j < 9; j++) {
