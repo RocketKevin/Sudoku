@@ -126,28 +126,28 @@ class Board extends React.Component {
     return backup;
   }
 
-  //Undo removeRandomNumber
-  undoRemoveRandomNumber(undo, valueBoard) {
+  //Set the value of a position given by backup
+  resetValueBackToOriginal(undo, valueBoard) {
     //Reset the position, given from removeRandomNumber method, of the board's value
     valueBoard[undo[0]] = undo[1];
   }
 
-  findAllPossibleAnswers(valueBoard, backup) {
-    let allPossibleAnswers = [];
-    let oneSetOfAnswers = [];
+  getPossibleNumberInEmptySquares(valueBoard, backup) {
+    let positionAndAllPossibleNumbers = [];
+    let oneSetOfPossibleNumbers = [];
     for(let i = 0; i < backup.length; i++) {
       for(let j = 1; j < 10; j++) {
         if( this.isPossibleRow(j, this.returnRow(backup[i][0]), valueBoard) &&
             this.isPossibleCol(j, this.returnCol(backup[i][0]), valueBoard) &&
             this.isPossibleBlock(j, this.returnBlock(backup[i][0]), valueBoard)
         ) {
-          oneSetOfAnswers.push(j);
+          oneSetOfPossibleNumbers.push(j);
         }
       }
-      allPossibleAnswers.push([backup[i][0], oneSetOfAnswers]);
-      oneSetOfAnswers = [];
+      positionAndAllPossibleNumbers.push([backup[i][0], oneSetOfPossibleNumbers]);
+      oneSetOfPossibleNumbers = [];
     }
-    return allPossibleAnswers;
+    return positionAndAllPossibleNumbers;
   }
 
   /* In Progress */
@@ -155,16 +155,16 @@ class Board extends React.Component {
     //console.log(possibleNumber);
     for(let i = 0; i < possibleNumber.length; i++) {
         if(possibleNumber[i][1].length < 1) {
-            //console.log("true");
+            console.log("true");
             //If more than one, plug in the number
             //Solve the board
             //If solvable return false
+            //Remove number
         }
     }
     return true;
   }
 
-  /* In Progress */
   safelyRemoveNumbers(valueBoard) {
     let backup = [];
     let possibleNumbers = [];
@@ -172,15 +172,16 @@ class Board extends React.Component {
     while(index < 15) {
       //Remove number and obtain it's value and position
       backup.push(this.removeRandomNumber(valueBoard));
+      console.log(backup);
       //Find all possible answers for each cell
-      possibleNumbers = this.findAllPossibleAnswers(valueBoard, backup);
+      possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
       //Check unique 
       if(this.isUnique(valueBoard, possibleNumbers, backup)) {
         index++;
       } else {
-        this.undoRemoveRandomNumber(backup[index], valueBoard);
+        this.resetValueBackToOriginal(backup[index], valueBoard);
       }
-      console.log(backup);
+      //console.log(backup);
     }
 
     return 0;
