@@ -150,12 +150,68 @@ class Board extends React.Component {
     return positionAndAllPossibleNumbers;
   }
 
+  getPossibleNumberInThisSquares(valueBoard, index) {
+    let allPossibleNumbers = [];
+    for(let j = 1; j < 10; j++) {
+      if( this.isPossibleRow(j, this.returnRow(index), valueBoard) &&
+          this.isPossibleCol(j, this.returnCol(index), valueBoard) &&
+          this.isPossibleBlock(j, this.returnBlock(index), valueBoard)
+      ) {
+        allPossibleNumbers.push(j);
+      }
+    }
+    return allPossibleNumbers;
+  }
+
+  cheapSolver(valueBoard) {
+    let tempBoard = [];
+    let possibleNumbers = [];
+    let onOrOff = 1;
+    while(onOrOff === 1) {
+      onOrOff = 0;
+      for(let i = 0; i < 81; i++) {
+        tempBoard[i] = valueBoard[i];
+        if(tempBoard[i] === 0) {
+          possibleNumbers = this.getPossibleNumberInThisSquares(valueBoard, i);
+          if(possibleNumbers.length === 1) {
+            tempBoard[i] = parseInt(possibleNumbers);
+          } else if(possibleNumbers.length === 0) {
+            return false;
+          } else {
+            return false;
+          }
+        }
+      }
+
+      let a = 0
+      while(a < 81) {
+        if(tempBoard[a] === 0) {
+          onOrOff = 1;
+        }
+        a++;
+      }
+    }
+    return true;
+  }
+
   /* In Progress */
-  isUnique(valueBoard, possibleNumber, backup) {
-    //console.log(possibleNumber);
+  isUnique(valueBoard, possibleNumber) {
+    //console.log(possibleNumber[2]);
     for(let i = 0; i < possibleNumber.length; i++) {
-        if(possibleNumber[i][1].length < 1) {
-            console.log("true");
+        if(possibleNumber[i][1].length > 1) {
+            //console.log("true");
+            for(let j = 0; j < possibleNumber[i][1].length; j++) {
+              //console.log(possibleNumber[i][1][j]);
+              valueBoard[possibleNumber[i][0]] = possibleNumber[i][1][j];
+              
+              
+              if(this.cheapSolver(valueBoard)) {
+                valueBoard[possibleNumber[i][0]] = 0;
+                return false;
+              }
+              
+              valueBoard[possibleNumber[i][0]] = 0;
+            }
             //If more than one, plug in the number
             //Solve the board
             //If solvable return false
