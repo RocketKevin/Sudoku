@@ -107,7 +107,7 @@ class Board extends React.Component {
     //Pick a random position o the board
     let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
 
-    let backup = [];
+    let positionAndValue = [];
 
     //Change the random number if the position it's on was a zero
     while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
@@ -116,14 +116,14 @@ class Board extends React.Component {
     }
 
     //Back up position of board's value removed and it's number
-    backup.push(randomPositionOfBoard);
-    backup.push(valueBoard[randomPositionOfBoard]);
+    positionAndValue.push(randomPositionOfBoard);
+    positionAndValue.push(valueBoard[randomPositionOfBoard]);
 
     //Set value of the random picked position to zero
     valueBoard[randomPositionOfBoard] = 0;
     
     //Tell which position got their number removed and what number
-    return backup;
+    return positionAndValue;
   }
 
   //Set the value of a position given by backup
