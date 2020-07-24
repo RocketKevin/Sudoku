@@ -13,10 +13,25 @@ class Square extends React.Component {
     
     //Get variables from outside
     let val = this.props.displayValue;
+    let whichClass = "square";
+
+    if(Math.floor(this.props.celliD / 9) % 3 === 0) {
+      whichClass += " top";
+    } 
+    if(Math.floor(this.props.celliD / 9) % 3 === 2) {
+      whichClass += " bottom";
+    } 
+    if(this.props.celliD % 3 === 0) {
+      whichClass += " left";
+    } 
+    if(this.props.celliD % 3 === 2) {
+      whichClass += " right";
+    }
 
     //If there is no value, player can enter value
     if(this.props.displayValue === 0) {
       val = this.state.inputValue;
+      whichClass += " zero";
     }
 
     return (
@@ -24,7 +39,7 @@ class Square extends React.Component {
       //Each square is an input box 
       <input 
         type="" 
-        className="square"
+        class={whichClass}
 
         //Only one letter, number, or character
         maxlength="1"
@@ -38,6 +53,8 @@ class Square extends React.Component {
         onChange={event => this.setState({inputValue: event.target.value.replace(/\D/,'')})}
       >
       </input>
+
+      
     );
   }
 }
@@ -45,8 +62,9 @@ class Square extends React.Component {
 class Board extends React.Component {
 
   //Create a square
-  renderSquare(num) {
-    return <Square 
+  renderSquare(iD, num) {
+    return <Square
+      celliD = {iD} 
       displayValue = {num}
     />;
   }
@@ -279,7 +297,7 @@ class Board extends React.Component {
       for(let j = 0; j < 9; j++) {
         board.push(
           <div>
-            {this.renderSquare(valueBoard[i * 9 + j])}
+            {this.renderSquare((i * 9 + j), valueBoard[i * 9 + j])}
           </div>
         )
       }
@@ -295,6 +313,7 @@ class Board extends React.Component {
 
 class App extends React.Component {
   render() {
+
     return (
       <div className="App">
         
