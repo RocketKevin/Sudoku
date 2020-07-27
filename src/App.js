@@ -164,7 +164,7 @@ class Board extends React.Component {
   static verifyRow(rowToVerify, board) {
     let numCol = 9;
     let maxSudokuValue = 9;
-    let rowSet = new Set(); //create new set to store values of row
+    const rowSet = new Set(); //create new set to store values of row
     
     //add values of board into Set
     for (let col = 0; col < numCol; col++) {
@@ -195,7 +195,7 @@ class Board extends React.Component {
   static verifyCol(colToVerify, board) {
     let numRow = 9;
     let maxSudokuValue = 9;
-    let colSet = new Set(); //create new set to store values of col
+    const colSet = new Set(); //create new set to store values of col
 
     //add values of board into Set
     for (let row = 0; row < numRow; row++) {
@@ -228,7 +228,7 @@ class Board extends React.Component {
    * @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
    */
   static verifySubgrid(subgridToVerify, board) {
-    let subgridSet = new Set();
+    const subgridSet = new Set();
     let colStartingPoint = (subgridToVerify % 3) * 3;
     let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
     //subgrid for first row
@@ -256,7 +256,7 @@ class Board extends React.Component {
 
   /*
    * This method checks if the board in the parameter is a valid solution
-   * by checking whether each row, collumn, and subgrid are valid.
+   * by checking whether all rows, collumn, and subgrid are valid.
    * Method returns false if the board violates any Sudoku mechanics, 
    * true otherwise. 
    */
