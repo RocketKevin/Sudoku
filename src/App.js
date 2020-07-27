@@ -154,117 +154,125 @@ class Board extends React.Component {
     }
   }
 
-  /*
-   * This method checks the solutions for the specified row. 
+  /**
+   * This method checks the solutions for the specified row.
    * A row is valid if there's 9 values and all numbers 1-9 are present.
-   * Returns true if valid row, false otherwise
    *
-   * @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
+   * @returns boolean, true if valid row, false otherwise
+   * @param {*} rowToVerify, an integer number
+   * @param {*} board, board is a 1D array representing Sudoku board
    */
-  static verifyRow(rowToVerify, board) {
+  static isRowComplete(rowToVerify, board) {
     let numCol = 9;
     let maxSudokuValue = 9;
     const rowSet = new Set(); //create new set to store values of row
     
     //add values of board into Set
     for (let col = 0; col < numCol; col++) {
-      rowSet.add(board[rowToVerify][col]);
+      //board is a 1D array, so we need to get the element num
+      rowSet.add(board[(9 * rowToVerify) + col]); 
     }
-
     //should have 9 values in row
-    if (rowSet.size != maxSudokuValue) {
+    if (rowSet.size !== maxSudokuValue) {
       return false;
     }
 
     // check if all possible values 1-9 are all in rowSet
     for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-      if (rowSet.has(possibleSudoKuValue) == false) {
+      if (rowSet.has(possibleSudoKuValue) === false) {
         return false;
       }
     }
     return true; //we've check that all numbers 1-9 are in the row
   }
 
-  /*
-  * This method checks the solutions for the specified col. 
-  * A collumn is valid if there's 9 values and all numbers 1-9 are present.
-  * Returns true if valid col, false otherwise
-  *
-  * @param colowToVerify is an integer number, board is a 2D array representing Sudoku board
-  */
-  static verifyCol(colToVerify, board) {
+  /**
+   * This method validates the solutions for the specified col.
+   * A collumn is valid if there's 9 values and all numbers 1-9 are present.
+   *
+   * @returns boolean, true if valid col, false otherwise
+   * @param {*} colToVerify, an integer number
+   * @param {*} board 
+   */
+  static isColComplete(colToVerify, board) {
     let numRow = 9;
     let maxSudokuValue = 9;
     const colSet = new Set(); //create new set to store values of col
 
-    //add values of board into Set
+    //add col values of board into Set
     for (let row = 0; row < numRow; row++) {
-      colSet.add(board[row][colToVerify]);
+      colSet.add(board[(9 * row) + colToVerify]);
     }
 
-    //should have 9 values in row
+    //should have 9 values in col
     if (colSet.size != maxSudokuValue) {
       return false;
     }
 
     // check if all possible values 1-9 are all in colSet
     for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-      if (colSet.has(possibleSudoKuValue) == false) {
+      if (colSet.has(possibleSudoKuValue) === false) {
         return false;
       }
     }
     return true; //we've check that all numbers 1-9 are in the col
   }
-  
-  /*
-   * This method checks the solutions for the specified subgrid. 
+
+  /**
+   * This method checks the solutions for the specified subgrid.
    * A subgrid is valid if there's 9 values and all numbers 1-9 are present.
-   * Returns true if valid subgrid, false otherwise. Subgrids are numbered
-   * 
+   * Subgrids are numbered as follows
+   *
    * 0 1 2
    * 3 4 5
    * 6 7 8
    *
-   * @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
+   * @returns boolean, true if valid subgrid, false otherwise.
+   * @param {*} subgridToVerify integer number
+   * @param {*} board 1D array representing Sudoku board
    */
-  static verifySubgrid(subgridToVerify, board) {
-    const subgridSet = new Set();
-    let colStartingPoint = (subgridToVerify % 3) * 3;
+  static isSubgridComplete (subgridToVerify, board) {
+    const subgridSet = new Set(); //set to store values in the suggrid
     let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
-    //subgrid for first row
+    let colStartingPoint = (subgridToVerify % 3) * 3;
 
+    //iterate through all values of the subgrid and add them to the set
     for (let row = rowStartingPoint; row < 3 + rowStartingPoint; row++) {
       for (let col = colStartingPoint; col < 3 + colStartingPoint; col++) {
-        subgridSet.add(board[row][col]);
+        subgridSet.add(board[(9 * row) + col]);
       }
     }
 
+    //check that there's 9 values in the subgrid
     let maxSudokuValue = 9;
     if (subgridSet.size != maxSudokuValue) {
       return false;
     }
 
-    // check if all possible values 1-9 are all in colSet
+    // check if all possible values 1-9 are all in subgridSet
     for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
       if (subgridSet.has(possibleSudoKuValue) == false ) {
         return false;
       }
     }
-    return true; //we've check that all numbers 1-9 are in the col
+    return true; //we've check that all numbers 1-9 are in the subgridSet
     
   }
 
-  /*
-   * This method checks if the board in the parameter is a valid solution
-   * by checking whether all rows, collumn, and subgrid are valid.
-   * Method returns false if the board violates any Sudoku mechanics, 
-   * true otherwise. 
-   */
-  static verifySolution(board) {
+  /**
+  * This method checks if the board in the parameter is a valid solution
+  * by checking whether all rows, collumn, and subgrid are valid. A component
+  * is valid if it follows all Sudoku mechanics
+  *
+  * @returns boolean, false if the board violates any Sudoku mechanics,
+  * true otherwise
+  * @param {*} board, 1D array representing Sudoku board
+  */
+  static isSolutionComplete(board) {
     for (let index = 0; index < 9; index++) {
-      //is this how I call a static method?
-      if (Board.verifyRow(index, board) == false || Board.verifyCol(index, board) == false
-          || Board.verifySubgrid(index, board) == false) {
+      //verifying each smaller section of the board
+      if (Board.verifyRow(index, board) === false || Board.verifyCol(index, board) === false
+        || Board.verifySubgrid(index, board) === false) {
         return false;
       }
     }
