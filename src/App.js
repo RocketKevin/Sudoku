@@ -260,14 +260,14 @@ class Board extends React.Component {
   }
 
   /**
-  * This method checks if the board in the parameter is a valid solution
-  * by checking whether all rows, collumn, and subgrid are valid. A component
-  * is valid if it follows all Sudoku mechanics
-  *
-  * @returns boolean, false if the board violates any Sudoku mechanics,
-  * true otherwise
-  * @param {*} board, 1D array representing Sudoku board
-  */
+   * This method checks if the board in the parameter is a valid solution
+   * by checking whether all rows, collumn, and subgrid are valid. A component
+   * is valid if it follows all Sudoku mechanics
+   *
+   * @returns boolean, false if the board violates any Sudoku mechanics,
+   * true otherwise
+   * @param {*} board, 1D array representing Sudoku board
+   */
   static isSolutionComplete(board) {
     for (let index = 0; index < 9; index++) {
       //verifying each smaller section of the board
