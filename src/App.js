@@ -251,12 +251,11 @@ class Board extends React.Component {
 
     // check if all possible values 1-9 are all in subgridSet
     for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-      if (subgridSet.has(possibleSudoKuValue) == false ) {
+      if (subgridSet.has(possibleSudoKuValue) === false ) {
         return false;
       }
     }
     return true; //we've check that all numbers 1-9 are in the subgridSet
-    
   }
 
   /**
@@ -278,6 +277,8 @@ class Board extends React.Component {
     }
     return true;
   }
+
+  
 
   render() {
 
