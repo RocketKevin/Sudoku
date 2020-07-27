@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 
+
 //Making individual squares
 class Square extends React.Component {
   constructor(props) {
@@ -155,17 +156,18 @@ class Board extends React.Component {
 
   /*
    * This method checks the solutions for the specified row. 
+   * A row is valid if there's 9 values and all numbers 1-9 are present.
    * Returns true if valid row, false otherwise
    *
    * @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
    */
   static verifyRow(rowToVerify, board) {
-    var numCol = 9;
-    var maxSudokuValue = 9;
+    let numCol = 9;
+    let maxSudokuValue = 9;
     let rowSet = new Set(); //create new set to store values of row
     
     //add values of board into Set
-    for (var col = 0; col < numCol; col++) {
+    for (let col = 0; col < numCol; col++) {
       rowSet.add(board[rowToVerify][col]);
     }
 
@@ -175,7 +177,7 @@ class Board extends React.Component {
     }
 
     // check if all possible values 1-9 are all in rowSet
-    for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+    for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
       if (rowSet.has(possibleSudoKuValue) == false) {
         return false;
       }
@@ -185,18 +187,19 @@ class Board extends React.Component {
 
   /*
   * This method checks the solutions for the specified col. 
+  * A collumn is valid if there's 9 values and all numbers 1-9 are present.
   * Returns true if valid col, false otherwise
   *
-  * @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
+  * @param colowToVerify is an integer number, board is a 2D array representing Sudoku board
   */
   static verifyCol(colToVerify, board) {
-    var numRow = 9;
-    var maxSudokuValue = 9;
+    let numRow = 9;
+    let maxSudokuValue = 9;
     let colSet = new Set(); //create new set to store values of col
 
     //add values of board into Set
-    for (var row = 0; row < numRow; row++) {
-      rowSet.add(board[row][colToVerify]);
+    for (let row = 0; row < numRow; row++) {
+      colSet.add(board[row][colToVerify]);
     }
 
     //should have 9 values in row
@@ -205,7 +208,7 @@ class Board extends React.Component {
     }
 
     // check if all possible values 1-9 are all in colSet
-    for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+    for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
       if (colSet.has(possibleSudoKuValue) == false) {
         return false;
       }
@@ -214,35 +217,36 @@ class Board extends React.Component {
   }
   
   /*
-  * This method checks the solutions for the specified subgrid. 
-  * Returns true if valid subgrid, false otherwise. Subgrids are numbered
-  * 
-  * 0 1 2
-  * 3 4 5
-  * 6 7 8
-  *
-  * @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
-  */
+   * This method checks the solutions for the specified subgrid. 
+   * A subgrid is valid if there's 9 values and all numbers 1-9 are present.
+   * Returns true if valid subgrid, false otherwise. Subgrids are numbered
+   * 
+   * 0 1 2
+   * 3 4 5
+   * 6 7 8
+   *
+   * @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
+   */
   static verifySubgrid(subgridToVerify, board) {
     let subgridSet = new Set();
-    var colStartingPoint = (subgridToVerify % 3) * 3;
-    var rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
+    let colStartingPoint = (subgridToVerify % 3) * 3;
+    let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
     //subgrid for first row
 
-    for (var row = rowStartingPoint; row < 3 + rowStartingPoint; row++) {
-      for (var col = colStartingPoint; col < 3 + colStartingPoint; col++) {
+    for (let row = rowStartingPoint; row < 3 + rowStartingPoint; row++) {
+      for (let col = colStartingPoint; col < 3 + colStartingPoint; col++) {
         subgridSet.add(board[row][col]);
       }
     }
 
-    var maxSudokuValue = 9;
-    if (colSet.size != maxSudokuValue) {
+    let maxSudokuValue = 9;
+    if (subgridSet.size != maxSudokuValue) {
       return false;
     }
 
     // check if all possible values 1-9 are all in colSet
-    for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-      if (colSet.has(possibleSudoKuValue) == false) {
+    for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+      if (subgridSet.has(possibleSudoKuValue) == false ) {
         return false;
       }
     }
@@ -257,7 +261,8 @@ class Board extends React.Component {
    * true otherwise. 
    */
   static verifySolution(board) {
-    for (var index = 0; index < 9; index++) {
+    for (let index = 0; index < 9; index++) {
+      //is this how I call a static method?
       if (Board.verifyRow(index, board) == false || Board.verifyCol(index, board) == false
           || Board.verifySubgrid(index, board) == false) {
         return false;
