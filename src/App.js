@@ -1,6 +1,143 @@
 import React from 'react';
 import './App.css';
 
+//Holds one true value
+let valueBoard = [];
+
+/*
+* This method checks the solutions for the specified row. 
+* Returns true if valid row, false otherwise
+*
+* @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
+*/
+function verifyRow(rowToVerify, rowSet) {
+  var numCol = 9;
+  var maxSudokuValue = 9;
+  // console.log("True");
+  //add values of board into Set
+  for (var col = 0; col < numCol; col++) {
+    rowSet.add(parseInt(valueBoard[rowToVerify * 9 + col]));
+  }
+
+  //should have 9 values in row
+  if (rowSet.size !== maxSudokuValue) {
+    return false;
+  }
+
+  // check if all possible values 1-9 are all in rowSet
+  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+    if (rowSet.has(possibleSudoKuValue) === false) {
+      return false;
+    }
+  }
+  return true; //we've check that all numbers 1-9 are in the row
+}
+
+/*
+* This method checks the solutions for the specified col. 
+* Returns true if valid col, false otherwise
+*
+* @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
+*/
+function verifyCol(colToVerify, colSet) {
+  var numRow = 9;
+  var maxSudokuValue = 9;
+  // console.log("True");
+  //add values of board into Set
+  for (var row = 0; row < numRow; row++) {
+    colSet.add(parseInt(valueBoard[row * 9 + colToVerify]));
+  }
+
+  //should have 9 values in row
+  if (colSet.size !== maxSudokuValue) {
+    return false;
+  }
+
+  // check if all possible values 1-9 are all in colSet
+  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+    if (colSet.has(possibleSudoKuValue) === false) {
+      return false;
+    }
+  }
+  return true; //we've check that all numbers 1-9 are in the col
+}
+
+/*
+* This method checks the solutions for the specified subgrid. 
+* Returns true if valid subgrid, false otherwise. Subgrids are numbered
+* 
+* 0 1 2
+* 3 4 5
+* 6 7 8
+*
+* @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
+*/
+function verifySubgrid(subgridToVerify, colSet) {
+  let subgridSet = new Set();
+  var colStartingPoint = (subgridToVerify % 3) * 3;
+  var rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
+  //subgrid for first row
+
+  for (var row = (rowStartingPoint*3); row < 3 + (rowStartingPoint*3); row++) {
+    for (var col = colStartingPoint; col < 3 + colStartingPoint; col++) {
+      subgridSet.add(parseInt(valueBoard[row * 9 + col]));
+    }
+  }
+
+  var maxSudokuValue = 9;
+  if (colSet.size !== maxSudokuValue) {
+    return false;
+  }
+
+  // check if all possible values 1-9 are all in colSet
+  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+    if (colSet.has(possibleSudoKuValue) === false) {
+      return false;
+    }
+  }
+  return true; //we've check that all numbers 1-9 are in the col
+  
+}
+
+/*
+* This method checks if the board in the parameter is a valid solution
+* by checking whether each row, collumn, and subgrid are valid.
+* Method returns false if the board violates any Sudoku mechanics, 
+* true otherwise. 
+*/
+function verifySolution() {
+  
+  let colSet = new Set(); //create new set to store values of col
+  let rowSet = new Set(); //create new set to store values of row
+
+  for (var index = 0; index < 9; index++) {
+    let verifyColBox = verifyCol(index, colSet, rowSet);
+    let verifyRowBox = verifyRow(index, rowSet);
+    console.log("index: " + index + ", verifyRowBox: " + verifyRowBox);
+    
+    let verifySubgridBox = verifySubgrid(index, colSet);
+    console.log("verifyColBox: " + verifyColBox + ", verifyRowBox: " + verifyRowBox +  ", verifySubgridBox: " + verifySubgridBox);
+    colSet.clear();
+    rowSet.clear();
+    if (verifyRowBox === false || verifyColBox === false || verifySubgridBox === false) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function stateOfWorld() {
+  for(let i = 0; i < 81; i++) {
+    valueBoard[i] = document.getElementById(i).value;
+  }
+
+  if(verifySolution() === true) {
+    alert("You Win!");
+  }
+  console.log(valueBoard);
+}
+
 //Making individual squares
 class Square extends React.Component {
   constructor(props) {
@@ -10,7 +147,7 @@ class Square extends React.Component {
     };
   }
   render() {
-    
+
     //Get variables from outside
     let val = this.props.displayValue;
     let whichClass = "square";
@@ -37,9 +174,10 @@ class Square extends React.Component {
     return (
 
       //Each square is an input box 
-      <input 
-        type="" 
+      <input
+        type=""
         class={whichClass}
+        id={this.props.celliD}
 
         //Only one letter, number, or character
         maxlength="1"
@@ -54,13 +192,13 @@ class Square extends React.Component {
       >
       </input>
 
-      
+
     );
   }
 }
 
 class Board extends React.Component {
-
+  
   //Create a square
   renderSquare(iD, num) {
     return <Square
@@ -68,15 +206,15 @@ class Board extends React.Component {
       displayValue = {num}
     />;
   }
-
+  
   // given a sudoku position, returns the row
   returnRow(position) {
-	  return Math.floor(position / 9);
+    return Math.floor(position / 9);
   }
 
   // given a sudoku position, returns the column
   returnCol(position) {
-	  return position % 9;
+    return position % 9;
   }
 
   //Gives 3 by 3 block
@@ -93,7 +231,7 @@ class Board extends React.Component {
     }
     return true;
   }
-  
+
   //Check for conflict in col
   isPossibleCol(randomNumber, x, valueBoard) {
     for (let i = 0; i < 9; i++) {
@@ -110,7 +248,7 @@ class Board extends React.Component {
     //Iterate through the 3 by 3 block
     for (let i = 0; i < 9; i++) {
       let oneOfTheNumberInThreeByThreeBlock = Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3);
-      
+
       //If one of the number in 3 by 3 block is the same as the random number
       if (parseInt(valueBoard[oneOfTheNumberInThreeByThreeBlock]) === randomNumber) {
         return false;
@@ -126,28 +264,22 @@ class Board extends React.Component {
     let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
 
     let positionAndValue = [];
-
+  
     //Change the random number if the position it's on was a zero
     while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
       //Reset random number
       randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
     }
-
+  
     //Back up position of board's value removed and it's number
     positionAndValue.push(randomPositionOfBoard);
     positionAndValue.push(valueBoard[randomPositionOfBoard]);
-
+  
     //Set value of the random picked position to zero
     valueBoard[randomPositionOfBoard] = 0;
-    
+      
     //Tell which position got their number removed and what number
     return positionAndValue;
-  }
-
-  //Set the value of a position given by backup
-  resetValueBackToOriginal(undo, valueBoard) {
-    //Reset the position, given from removeRandomNumber method, of the board's value
-    valueBoard[undo[0]] = undo[1];
   }
 
   getPossibleNumberInEmptySquares(valueBoard, backup) {
@@ -155,14 +287,14 @@ class Board extends React.Component {
     let oneSetOfPossibleNumbers = [];
     for(let i = 0; i < backup.length; i++) {
       for(let j = 1; j < 10; j++) {
-        if( this.isPossibleRow(j, this.returnRow(backup[i][0]), valueBoard) &&
-            this.isPossibleCol(j, this.returnCol(backup[i][0]), valueBoard) &&
-            this.isPossibleBlock(j, this.returnBlock(backup[i][0]), valueBoard)
+        if( this.isPossibleRow(j, this.returnRow(backup[i]), valueBoard) &&
+            this.isPossibleCol(j, this.returnCol(backup[i]), valueBoard) &&
+            this.isPossibleBlock(j, this.returnBlock(backup[i]), valueBoard)
         ) {
           oneSetOfPossibleNumbers.push(j);
         }
       }
-      positionAndAllPossibleNumbers.push([backup[i][0], oneSetOfPossibleNumbers]);
+      positionAndAllPossibleNumbers.push([backup[i], oneSetOfPossibleNumbers]);
       oneSetOfPossibleNumbers = [];
     }
     return positionAndAllPossibleNumbers;
@@ -245,15 +377,15 @@ class Board extends React.Component {
     let index = 0;
     while(index < 15) {
       //Remove number and obtain it's value and position
-      backup.push(this.removeRandomNumber(valueBoard));
-      //console.log(backup);
+      backup = this.removeRandomNumber(valueBoard);
+      console.log(backup);
       //Find all possible answers for each cell
       possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
       //Check unique 
       if(this.isUnique(valueBoard, possibleNumbers)) {
         index++;
       } else {
-        this.resetValueBackToOriginal(backup[index], valueBoard);
+        valueBoard[backup[0]] = backup[1];
       }
       //console.log(backup);
     }
@@ -264,7 +396,7 @@ class Board extends React.Component {
   //Return position of which square currently in, either moving back, forward, or stay. 
   //Change the possibleNumberBoard and valueBoard
   positionGenerator(i, possibleNumberBoard, valueBoard) {
-    
+
     if(possibleNumberBoard[i].length === 0) {
 
       //If there are no possble numbers left, refill
@@ -279,11 +411,11 @@ class Board extends React.Component {
 
       //Get a random number from array
       let randomNumberOfArray = possibleNumberBoard[i][Math.floor(Math.random() * possibleNumberBoard[i].length)];
-      
+
       //Checks for confliction for row, col, and block
       if(
-        this.isPossibleRow(randomNumberOfArray, this.returnRow(i), valueBoard) && 
-        this.isPossibleCol(randomNumberOfArray, this.returnCol(i), valueBoard) && 
+        this.isPossibleRow(randomNumberOfArray, this.returnRow(i), valueBoard) &&
+        this.isPossibleCol(randomNumberOfArray, this.returnCol(i), valueBoard) &&
         this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), valueBoard)
       ) {
 
@@ -315,14 +447,11 @@ class Board extends React.Component {
   render() {
 
     //For display
-    let board = [];  
+    let board = [];
 
     //Holds possible values of a square
     let possibleNumberBoard = [];
 
-    //Holds one true value
-    let valueBoard = [];
-    
     for(let i = 0; i < 81; i++) {
       possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
       valueBoard.push(0);
@@ -347,7 +476,7 @@ class Board extends React.Component {
     }
 
     this.safelyRemoveNumbers(valueBoard);
-    
+
     //Store all into board
     for(let i = 0; i < 9; i++) {
       for(let j = 0; j < 9; j++) {
@@ -363,16 +492,29 @@ class Board extends React.Component {
       <div className="gameBoard">
         {board}
       </div>
+
     );
   }
 }
 
+class Submit extends React.Component {
+  
+  render() {
+    return(
+      <button id="submit" onClick={stateOfWorld}>
+        Submit
+      </button>
+    )
+  }
+}
+
 class App extends React.Component {
+
   render() {
 
     return (
       <div className="App">
-        
+
         <h1 id="title">
           Sudoku!
         </h1>
@@ -380,10 +522,10 @@ class App extends React.Component {
         <div className="game-board">
           <Board />
         </div>
-        
-        <button id="submit">
-          Submit
-        </button>
+
+        <div>
+          <Submit />
+        </div>
 
       </div>
     );
