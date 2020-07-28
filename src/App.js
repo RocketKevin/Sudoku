@@ -192,7 +192,6 @@ class Square extends React.Component {
       >
       </input>
 
-
     );
   }
 }
@@ -264,7 +263,7 @@ class Board extends React.Component {
     let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
 
     let positionAndValue = [];
-  
+
     //Change the random number if the position it's on was a zero
     while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
       //Reset random number
@@ -287,6 +286,7 @@ class Board extends React.Component {
     let oneSetOfPossibleNumbers = [];
     for(let i = 0; i < backup.length; i++) {
       for(let j = 1; j < 10; j++) {
+
         if( this.isPossibleRow(j, this.returnRow(backup[i]), valueBoard) &&
             this.isPossibleCol(j, this.returnCol(backup[i]), valueBoard) &&
             this.isPossibleBlock(j, this.returnBlock(backup[i]), valueBoard)
@@ -294,7 +294,9 @@ class Board extends React.Component {
           oneSetOfPossibleNumbers.push(j);
         }
       }
+
       positionAndAllPossibleNumbers.push([backup[i], oneSetOfPossibleNumbers]);
+      
       oneSetOfPossibleNumbers = [];
     }
     return positionAndAllPossibleNumbers;
@@ -362,6 +364,7 @@ class Board extends React.Component {
               
               valueBoard[possibleNumber[i][0]] = 0;
             }
+
             //If more than one, plug in the number
             //Solve the board
             //If solvable return false
@@ -377,11 +380,14 @@ class Board extends React.Component {
     let index = 0;
     while(index < 15) {
       //Remove number and obtain it's value and position
+
       backup = this.removeRandomNumber(valueBoard);
+      
       console.log(backup);
       //Find all possible answers for each cell
       possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
       //Check unique 
+
       if(this.isUnique(valueBoard, possibleNumbers)) {
         index++;
       } else {
@@ -396,7 +402,7 @@ class Board extends React.Component {
   //Return position of which square currently in, either moving back, forward, or stay. 
   //Change the possibleNumberBoard and valueBoard
   positionGenerator(i, possibleNumberBoard, valueBoard) {
-
+    
     if(possibleNumberBoard[i].length === 0) {
 
       //If there are no possble numbers left, refill
