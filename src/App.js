@@ -122,7 +122,7 @@ function isColComplete(colToVerify, board) {
  */
 function isSubgridComplete(subgridToVerify, board) {
   const subgridSet = new Set(); //set to store values in the suggrid
-  let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
+  let rowStartingPoint = Math.floor(subgridToVerify / 3) * 3; //using integer division
   let colStartingPoint = (subgridToVerify % 3) * 3;
 
   //iterate through all values of the subgrid and add them to the set
