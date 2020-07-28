@@ -14,18 +14,34 @@ class Square extends React.Component {
 
     //Get variables from outside
     let val = this.props.displayValue;
+    let whichClass = "square";
+
+    if(Math.floor(this.props.celliD / 9) % 3 === 0) {
+      whichClass += " top";
+    } 
+    if(Math.floor(this.props.celliD / 9) % 3 === 2) {
+      whichClass += " bottom";
+    } 
+    if(this.props.celliD % 3 === 0) {
+      whichClass += " left";
+    } 
+    if(this.props.celliD % 3 === 2) {
+      whichClass += " right";
+    }
 
     //If there is no value, player can enter value
     if (this.props.displayValue === 0) {
       val = this.state.inputValue;
+      whichClass += " zero";
     }
 
     return (
 
       //Each square is an input box 
-      <input
-        type=""
-        className="square"
+
+      <input 
+        type="" 
+        class={whichClass}
 
         //Only one letter, number, or character
         maxlength="1"
@@ -39,6 +55,8 @@ class Square extends React.Component {
         onChange={event => this.setState({ inputValue: event.target.value.replace(/\D/, '') })}
       >
       </input>
+
+      
     );
   }
 }
@@ -171,9 +189,11 @@ function isSolutionComplete(board) {
 class Board extends React.Component {
 
   //Create a square
-  renderSquare(num) {
+  renderSquare(iD, num) {
     return <Square
-      displayValue={num}
+      celliD = {iD} 
+      displayValue = {num}
+
     />;
   }
 
@@ -225,6 +245,149 @@ class Board extends React.Component {
       }
     }
     return true;
+  }
+
+  //Remove a random number from the board
+  removeRandomNumber(valueBoard) {
+
+    //Pick a random position o the board
+    let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
+
+    let positionAndValue = [];
+
+    //Change the random number if the position it's on was a zero
+    while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
+      //Reset random number
+      randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
+    }
+
+    //Back up position of board's value removed and it's number
+    positionAndValue.push(randomPositionOfBoard);
+    positionAndValue.push(valueBoard[randomPositionOfBoard]);
+
+    //Set value of the random picked position to zero
+    valueBoard[randomPositionOfBoard] = 0;
+    
+    //Tell which position got their number removed and what number
+    return positionAndValue;
+  }
+
+  //Set the value of a position given by backup
+  resetValueBackToOriginal(undo, valueBoard) {
+    //Reset the position, given from removeRandomNumber method, of the board's value
+    valueBoard[undo[0]] = undo[1];
+  }
+
+  getPossibleNumberInEmptySquares(valueBoard, backup) {
+    let positionAndAllPossibleNumbers = [];
+    let oneSetOfPossibleNumbers = [];
+    for(let i = 0; i < backup.length; i++) {
+      for(let j = 1; j < 10; j++) {
+        if( this.isPossibleRow(j, this.returnRow(backup[i][0]), valueBoard) &&
+            this.isPossibleCol(j, this.returnCol(backup[i][0]), valueBoard) &&
+            this.isPossibleBlock(j, this.returnBlock(backup[i][0]), valueBoard)
+        ) {
+          oneSetOfPossibleNumbers.push(j);
+        }
+      }
+      positionAndAllPossibleNumbers.push([backup[i][0], oneSetOfPossibleNumbers]);
+      oneSetOfPossibleNumbers = [];
+    }
+    return positionAndAllPossibleNumbers;
+  }
+
+  getPossibleNumberInThisSquares(valueBoard, index) {
+    let allPossibleNumbers = [];
+    for(let j = 1; j < 10; j++) {
+      if( this.isPossibleRow(j, this.returnRow(index), valueBoard) &&
+          this.isPossibleCol(j, this.returnCol(index), valueBoard) &&
+          this.isPossibleBlock(j, this.returnBlock(index), valueBoard)
+      ) {
+        allPossibleNumbers.push(j);
+      }
+    }
+    return allPossibleNumbers;
+  }
+
+  cheapSolver(valueBoard) {
+    let tempBoard = [];
+    let possibleNumbers = [];
+    let onOrOff = 1;
+    while(onOrOff === 1) {
+      onOrOff = 0;
+      for(let i = 0; i < 81; i++) {
+        tempBoard[i] = valueBoard[i];
+        if(tempBoard[i] === 0) {
+          possibleNumbers = this.getPossibleNumberInThisSquares(valueBoard, i);
+          if(possibleNumbers.length === 1) {
+            tempBoard[i] = parseInt(possibleNumbers);
+          } else if(possibleNumbers.length === 0) {
+            return false;
+          } else {
+            return false;
+          }
+        }
+      }
+
+      let a = 0
+      while(a < 81) {
+        if(tempBoard[a] === 0) {
+          onOrOff = 1;
+        }
+        a++;
+      }
+    }
+    return true;
+  }
+
+  /* In Progress */
+  isUnique(valueBoard, possibleNumber) {
+    //console.log(possibleNumber[2]);
+    for(let i = 0; i < possibleNumber.length; i++) {
+        if(possibleNumber[i][1].length > 1) {
+            //console.log("true");
+            for(let j = 0; j < possibleNumber[i][1].length; j++) {
+              //console.log(possibleNumber[i][1][j]);
+              valueBoard[possibleNumber[i][0]] = possibleNumber[i][1][j];
+              
+              
+              if(this.cheapSolver(valueBoard)) {
+                valueBoard[possibleNumber[i][0]] = 0;
+                return false;
+              }
+              
+              valueBoard[possibleNumber[i][0]] = 0;
+            }
+          
+            //If more than one, plug in the number
+            //Solve the board
+            //If solvable return false
+            //Remove number
+        }
+    }
+    return true;
+  }
+
+  safelyRemoveNumbers(valueBoard) {
+    let backup = [];
+    let possibleNumbers = [];
+    let index = 0;
+    while(index < 15) {
+      //Remove number and obtain it's value and position
+      backup.push(this.removeRandomNumber(valueBoard));
+      console.log(backup);
+      //Find all possible answers for each cell
+      possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
+      //Check unique 
+      if(this.isUnique(valueBoard, possibleNumbers, backup)) {
+        index++;
+      } else {
+        this.resetValueBackToOriginal(backup[index], valueBoard);
+      }
+      //console.log(backup);
+    }
+
+    return 0;
   }
 
   //Return position of which square currently in, either moving back, forward, or stay. 
@@ -290,12 +453,15 @@ class Board extends React.Component {
     //Holds one true value
     let valueBoard = [];
 
+    
+    for(let i = 0; i < 81; i++) {
+      possibleNumberBoard.push([1,2,3,4,5,6,7,8,9]);
+      valueBoard.push(0);
+    }
+
     let index = 0;
 
     while (index < 81) {
-
-      possibleNumberBoard.push([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-      valueBoard.push(0);
 
       //Get new postion of index
       let position = this.positionGenerator(index, possibleNumberBoard, valueBoard);
@@ -311,12 +477,14 @@ class Board extends React.Component {
 
     }
 
+    this.safelyRemoveNumbers(valueBoard);
+    
     //Store all into board
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
         board.push(
           <div>
-            {this.renderSquare(valueBoard[i * 9 + j])}
+            {this.renderSquare((i * 9 + j), valueBoard[i * 9 + j])}
           </div>
         )
       }
@@ -332,6 +500,7 @@ class Board extends React.Component {
 
 class App extends React.Component {
   render() {
+
     return (
       <div className="App">
 
