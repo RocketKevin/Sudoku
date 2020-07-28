@@ -84,6 +84,7 @@
 
 #submit {
   margin-top: 25px;
+  margin-right: 10px;
 }
 
 .top {
@@ -104,6 +105,36 @@
 
 .zero {
   background: lightgray;
+}
+
+#dialog {
+  padding: 30px 30px 60px;
+  background-color: white;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  position: fixed;
+  border-radius: 10px;
+  border: solid;
+  display: flex;
+  z-index: 100;
+  flex-direction: column;
+  left: 50%;
+  top: 50%;
+  transform: translate(-49%, -110%);
+}
+
+#close {
+  background-color: red;
+  margin-bottom: 15px;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+  width: 30px;
+  height: 30px;
+  font-weight: bold;
+  align-self: flex-end;
 }
 
 @keyframes App-logo-spin {

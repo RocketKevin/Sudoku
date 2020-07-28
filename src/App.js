@@ -112,11 +112,8 @@ function verifySolution() {
 
   for (var index = 0; index < 9; index++) {
     let verifyColBox = verifyCol(index, colSet, rowSet);
-    let verifyRowBox = verifyRow(index, rowSet);
-    console.log("index: " + index + ", verifyRowBox: " + verifyRowBox);
-    
+    let verifyRowBox = verifyRow(index, rowSet);    
     let verifySubgridBox = verifySubgrid(index, colSet);
-    console.log("verifyColBox: " + verifyColBox + ", verifyRowBox: " + verifyRowBox +  ", verifySubgridBox: " + verifySubgridBox);
     colSet.clear();
     rowSet.clear();
     if (verifyRowBox === false || verifyColBox === false || verifySubgridBox === false) {
@@ -128,14 +125,21 @@ function verifySolution() {
 }
 
 function stateOfWorld() {
-  for(let i = 0; i < 81; i++) {
-    valueBoard[i] = document.getElementById(i).value;
+  if(document.readyState === "complete") {
+    for(let i = 0; i < 81; i++) {
+      valueBoard[i] = document.getElementById(i).value;
+    }
+    console.log("True");
   }
 
   if(verifySolution() === true) {
-    alert("You Win!");
+    return true;
   }
-  console.log(valueBoard);
+  return false;
+}
+
+function webReload() {
+  window.location.reload();
 }
 
 //Making individual squares
@@ -313,6 +317,7 @@ class Board extends React.Component {
     return allPossibleNumbers;
   }
 
+  //Temperary
   cheapSolver(valueBoard) {
     let tempBoard = [];
     let possibleNumbers = [];
@@ -344,7 +349,6 @@ class Board extends React.Component {
     return true;
   }
 
-  /* In Progress */
   isUnique(valueBoard, possibleNumber) {
     //console.log(possibleNumber[2]);
     for(let i = 0; i < possibleNumber.length; i++) {
@@ -378,7 +382,6 @@ class Board extends React.Component {
     while(index < 15) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(valueBoard);
-      console.log(backup);
       //Find all possible answers for each cell
       possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
       //Check unique 
@@ -497,13 +500,55 @@ class Board extends React.Component {
   }
 }
 
-class Submit extends React.Component {
-  
+class Box extends React.Component {
+  render() {
+
+    let text = "Something isn't right. Keep going!";
+
+    if(stateOfWorld()) {
+      text = "You Win";
+    }
+
+    let box = (
+      <div id="dialog">
+        <button id="close" onClick = {this.props.close}>
+          x
+        </button>
+        <div>
+          {text}
+        </div>
+      </div>
+    );
+
+    if(!this.props.open) {
+      box = null;
+    }
+
+    return(
+      <div>
+        {box}
+      </div>
+    );
+  }
+}
+
+class Button extends React.Component {
+
+  state = {
+    open: false
+  }
+
   render() {
     return(
-      <button id="submit" onClick={stateOfWorld}>
-        Submit
-      </button>
+      <div>
+        <button id="submit" onClick={(e) => this.setState({open: true})}>
+          Submit
+        </button>
+        <button onClick={webReload}>
+          New Game
+        </button>
+        <Box open = {this.state.open} close = {(e) => this.setState({open: false})}/>
+      </div>
     )
   }
 }
@@ -524,7 +569,7 @@ class App extends React.Component {
         </div>
 
         <div>
-          <Submit />
+          <Button />
         </div>
 
       </div>
