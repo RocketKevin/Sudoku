@@ -383,7 +383,7 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    while(index < 15) {
+    while(index < 30) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(valueBoard);
       //Find all possible answers for each cell
