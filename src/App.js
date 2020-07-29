@@ -114,6 +114,7 @@ function verifySolution() {
     let verifyColBox = verifyCol(index, colSet, rowSet);
     let verifyRowBox = verifyRow(index, rowSet);    
     let verifySubgridBox = verifySubgrid(index, colSet);
+
     colSet.clear();
     rowSet.clear();
     if (verifyRowBox === false || verifyColBox === false || verifySubgridBox === false) {
@@ -170,7 +171,7 @@ class Square extends React.Component {
     }
 
     //If there is no value, player can enter value
-    if(this.props.displayValue === 0) {
+    if (this.props.displayValue === 0) {
       val = this.state.inputValue;
       whichClass += " zero";
     }
@@ -192,11 +193,9 @@ class Square extends React.Component {
         }
 
         //Only number can be type
-        onChange={event => this.setState({inputValue: event.target.value.replace(/\D/,'')})}
+        onChange={event => this.setState({ inputValue: event.target.value.replace(/\D/, '') })}
       >
       </input>
-
-
     );
   }
 }
@@ -208,6 +207,7 @@ class Board extends React.Component {
     return <Square
       celliD = {iD} 
       displayValue = {num}
+
     />;
   }
   
@@ -228,8 +228,8 @@ class Board extends React.Component {
 
   //Check for conflict in row
   isPossibleRow(randomNumber, y, valueBoard) {
-    for(let i = 0; i < 9; i++) {
-      if(parseInt(valueBoard[y * 9 + i]) === randomNumber) {
+    for (let i = 0; i < 9; i++) {
+      if (parseInt(valueBoard[y * 9 + i]) === randomNumber) {
         return false;
       }
     }
@@ -239,7 +239,7 @@ class Board extends React.Component {
   //Check for conflict in col
   isPossibleCol(randomNumber, x, valueBoard) {
     for (let i = 0; i < 9; i++) {
-      if(parseInt(valueBoard[i * 9 + x]) === randomNumber) {
+      if (parseInt(valueBoard[i * 9 + x]) === randomNumber) {
         return false;
       }
     }
@@ -268,7 +268,7 @@ class Board extends React.Component {
     let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
 
     let positionAndValue = [];
-  
+
     //Change the random number if the position it's on was a zero
     while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
       //Reset random number
@@ -291,6 +291,7 @@ class Board extends React.Component {
     let oneSetOfPossibleNumbers = [];
     for(let i = 0; i < backup.length; i++) {
       for(let j = 1; j < 10; j++) {
+
         if( this.isPossibleRow(j, this.returnRow(backup[i]), valueBoard) &&
             this.isPossibleCol(j, this.returnCol(backup[i]), valueBoard) &&
             this.isPossibleBlock(j, this.returnBlock(backup[i]), valueBoard)
@@ -298,7 +299,9 @@ class Board extends React.Component {
           oneSetOfPossibleNumbers.push(j);
         }
       }
+
       positionAndAllPossibleNumbers.push([backup[i], oneSetOfPossibleNumbers]);
+
       oneSetOfPossibleNumbers = [];
     }
     return positionAndAllPossibleNumbers;
@@ -366,6 +369,7 @@ class Board extends React.Component {
               
               valueBoard[possibleNumber[i][0]] = 0;
             }
+
             //If more than one, plug in the number
             //Solve the board
             //If solvable return false
@@ -385,6 +389,7 @@ class Board extends React.Component {
       //Find all possible answers for each cell
       possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
       //Check unique 
+
       if(this.isUnique(valueBoard, possibleNumbers)) {
         index++;
       } else {
@@ -400,10 +405,10 @@ class Board extends React.Component {
   //Change the possibleNumberBoard and valueBoard
   positionGenerator(i, possibleNumberBoard, valueBoard) {
 
-    if(possibleNumberBoard[i].length === 0) {
+    if (possibleNumberBoard[i].length === 0) {
 
       //If there are no possble numbers left, refill
-      possibleNumberBoard[i] = [1,2,3,4,5,6,7,8,9];
+      possibleNumberBoard[i] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
       valueBoard[i] = 0;
       valueBoard[i - 1] = 0;
@@ -425,7 +430,7 @@ class Board extends React.Component {
         //If no confliction use the random number
         valueBoard[i] = [randomNumberOfArray];
         let index = possibleNumberBoard[i].indexOf(randomNumberOfArray);
-        if(index >= 0) {
+        if (index >= 0) {
           possibleNumberBoard[i].splice(index, 1);
         }
 
@@ -435,8 +440,8 @@ class Board extends React.Component {
 
         //If conflicts, remove that possible number
         let indexOne = possibleNumberBoard[i].indexOf(randomNumberOfArray);
-        if(indexOne >= 0) {
-          possibleNumberBoard[i].splice(indexOne,1);
+        if (indexOne >= 0) {
+          possibleNumberBoard[i].splice(indexOne, 1);
         }
 
         valueBoard[i] = 0;
@@ -447,6 +452,7 @@ class Board extends React.Component {
     }
   }
 
+  
   render() {
 
     //For display
@@ -468,7 +474,7 @@ class Board extends React.Component {
       let position = this.positionGenerator(index, possibleNumberBoard, valueBoard);
       let precheck = index + position;
 
-      if(precheck >= 0) {
+      if (precheck >= 0) {
 
         //Where index is at
         index += position;
@@ -481,8 +487,8 @@ class Board extends React.Component {
     this.safelyRemoveNumbers(valueBoard);
 
     //Store all into board
-    for(let i = 0; i < 9; i++) {
-      for(let j = 0; j < 9; j++) {
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
         board.push(
           <div>
             {this.renderSquare((i * 9 + j), valueBoard[i * 9 + j])}
@@ -495,7 +501,6 @@ class Board extends React.Component {
       <div className="gameBoard">
         {board}
       </div>
-
     );
   }
 }
