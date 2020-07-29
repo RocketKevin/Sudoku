@@ -511,12 +511,12 @@ class Box extends React.Component {
 
     let box = (
       <div id="dialog">
-        <button id="close" onClick = {this.props.close}>
-          x
-        </button>
         <div>
           {text}
         </div>
+        <button id="close" onClick = {this.props.close}>
+          Close
+        </button>
       </div>
     );
 
