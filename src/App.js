@@ -3,6 +3,7 @@ import './App.css';
 
 //Holds one true value
 let valueBoard = [];
+let mode = "easy";
 
 /*
 * This method checks the solutions for the specified row. 
@@ -139,7 +140,15 @@ function stateOfWorld() {
   return false;
 }
 
-function webReload() {
+function easy() {
+  var mode = "easy";
+  localStorage.setItem("mode", mode);
+  window.location.reload();
+}
+
+function hard() {
+  var mode = "hard";
+  localStorage.setItem("mode", mode);
   window.location.reload();
 }
 
@@ -227,9 +236,9 @@ class Board extends React.Component {
   }
 
   //Check for conflict in row
-  isPossibleRow(randomNumber, y, valueBoard) {
+  isPossibleRow(randomNumber, y, board) {
     for (let i = 0; i < 9; i++) {
-      if (parseInt(valueBoard[y * 9 + i]) === randomNumber) {
+      if (parseInt(board[y * 9 + i]) === randomNumber) {
         return false;
       }
     }
@@ -237,9 +246,9 @@ class Board extends React.Component {
   }
 
   //Check for conflict in col
-  isPossibleCol(randomNumber, x, valueBoard) {
+  isPossibleCol(randomNumber, x, board) {
     for (let i = 0; i < 9; i++) {
-      if (parseInt(valueBoard[i * 9 + x]) === randomNumber) {
+      if (parseInt(board[i * 9 + x]) === randomNumber) {
         return false;
       }
     }
@@ -247,14 +256,14 @@ class Board extends React.Component {
   }
 
   //Checks 3 by 3 block
-  isPossibleBlock(randomNumber, position, valueBoard) {
+  isPossibleBlock(randomNumber, position, board) {
 
     //Iterate through the 3 by 3 block
     for (let i = 0; i < 9; i++) {
       let oneOfTheNumberInThreeByThreeBlock = Math.floor(position / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (position % 3);
 
       //If one of the number in 3 by 3 block is the same as the random number
-      if (parseInt(valueBoard[oneOfTheNumberInThreeByThreeBlock]) === randomNumber) {
+      if (parseInt(board[oneOfTheNumberInThreeByThreeBlock]) === randomNumber) {
         return false;
       }
     }
@@ -262,39 +271,39 @@ class Board extends React.Component {
   }
 
   //Remove a random number from the board
-  removeRandomNumber(valueBoard) {
+  removeRandomNumber(board) {
 
     //Pick a random position o the board
-    let randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
+    let randomPositionOfBoard = Math.floor(Math.random() * board.length);
 
     let positionAndValue = [];
 
     //Change the random number if the position it's on was a zero
-    while(parseInt(valueBoard[randomPositionOfBoard]) === 0) {
+    while(parseInt(board[randomPositionOfBoard]) === 0) {
       //Reset random number
-      randomPositionOfBoard = Math.floor(Math.random() * valueBoard.length);
+      randomPositionOfBoard = Math.floor(Math.random() * board.length);
     }
   
     //Back up position of board's value removed and it's number
     positionAndValue.push(randomPositionOfBoard);
-    positionAndValue.push(valueBoard[randomPositionOfBoard]);
+    positionAndValue.push(board[randomPositionOfBoard]);
   
     //Set value of the random picked position to zero
-    valueBoard[randomPositionOfBoard] = 0;
+    board[randomPositionOfBoard] = 0;
       
     //Tell which position got their number removed and what number
     return positionAndValue;
   }
 
-  getPossibleNumberInEmptySquares(valueBoard, backup) {
+  getPossibleNumberInEmptySquares(board, backup) {
     let positionAndAllPossibleNumbers = [];
     let oneSetOfPossibleNumbers = [];
     for(let i = 0; i < backup.length; i++) {
       for(let j = 1; j < 10; j++) {
 
-        if( this.isPossibleRow(j, this.returnRow(backup[i]), valueBoard) &&
-            this.isPossibleCol(j, this.returnCol(backup[i]), valueBoard) &&
-            this.isPossibleBlock(j, this.returnBlock(backup[i]), valueBoard)
+        if( this.isPossibleRow(j, this.returnRow(backup[i]), board) &&
+            this.isPossibleCol(j, this.returnCol(backup[i]), board) &&
+            this.isPossibleBlock(j, this.returnBlock(backup[i]), board)
         ) {
           oneSetOfPossibleNumbers.push(j);
         }
@@ -307,12 +316,12 @@ class Board extends React.Component {
     return positionAndAllPossibleNumbers;
   }
 
-  getPossibleNumberInThisSquares(valueBoard, index) {
+  getPossibleNumberInThisSquares(board, index) {
     let allPossibleNumbers = [];
     for(let j = 1; j < 10; j++) {
-      if( this.isPossibleRow(j, this.returnRow(index), valueBoard) &&
-          this.isPossibleCol(j, this.returnCol(index), valueBoard) &&
-          this.isPossibleBlock(j, this.returnBlock(index), valueBoard)
+      if( this.isPossibleRow(j, this.returnRow(index), board) &&
+          this.isPossibleCol(j, this.returnCol(index), board) &&
+          this.isPossibleBlock(j, this.returnBlock(index), board)
       ) {
         allPossibleNumbers.push(j);
       }
@@ -352,22 +361,22 @@ class Board extends React.Component {
     return true;
   }
 
-  isUnique(valueBoard, possibleNumber) {
+  isUnique(board, possibleNumber) {
     //console.log(possibleNumber[2]);
     for(let i = 0; i < possibleNumber.length; i++) {
         if(possibleNumber[i][1].length > 1) {
             //console.log("true");
             for(let j = 0; j < possibleNumber[i][1].length; j++) {
               //console.log(possibleNumber[i][1][j]);
-              valueBoard[possibleNumber[i][0]] = possibleNumber[i][1][j];
+              board[possibleNumber[i][0]] = possibleNumber[i][1][j];
               
               
-              if(this.cheapSolver(valueBoard)) {
-                valueBoard[possibleNumber[i][0]] = 0;
+              if(this.cheapSolver(board)) {
+                board[possibleNumber[i][0]] = 0;
                 return false;
               }
               
-              valueBoard[possibleNumber[i][0]] = 0;
+              board[possibleNumber[i][0]] = 0;
             }
 
             //If more than one, plug in the number
@@ -379,21 +388,25 @@ class Board extends React.Component {
     return true;
   }
 
-  safelyRemoveNumbers(valueBoard) {
+  safelyRemoveNumbers(board) {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    while(index < 30) {
+    let amountRemove = 46;
+    if(mode === "easy") {
+      amountRemove = 15;
+    }
+    while(index < amountRemove) {
       //Remove number and obtain it's value and position
-      backup = this.removeRandomNumber(valueBoard);
+      backup = this.removeRandomNumber(board);
       //Find all possible answers for each cell
-      possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
+      possibleNumbers = this.getPossibleNumberInEmptySquares(board, backup);
       //Check unique 
 
-      if(this.isUnique(valueBoard, possibleNumbers)) {
+      if(this.isUnique(board, possibleNumbers)) {
         index++;
       } else {
-        valueBoard[backup[0]] = backup[1];
+        board[backup[0]] = backup[1];
       }
       //console.log(backup);
     }
@@ -403,15 +416,15 @@ class Board extends React.Component {
 
   //Return position of which square currently in, either moving back, forward, or stay. 
   //Change the possibleNumberBoard and valueBoard
-  positionGenerator(i, possibleNumberBoard, valueBoard) {
+  positionGenerator(i, possibleNumberBoard, board) {
 
     if (possibleNumberBoard[i].length === 0) {
 
       //If there are no possble numbers left, refill
       possibleNumberBoard[i] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-      valueBoard[i] = 0;
-      valueBoard[i - 1] = 0;
+      board[i] = 0;
+      board[i - 1] = 0;
 
       //Move backward by 1
       return -1;
@@ -422,13 +435,13 @@ class Board extends React.Component {
 
       //Checks for confliction for row, col, and block
       if(
-        this.isPossibleRow(randomNumberOfArray, this.returnRow(i), valueBoard) &&
-        this.isPossibleCol(randomNumberOfArray, this.returnCol(i), valueBoard) &&
-        this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), valueBoard)
+        this.isPossibleRow(randomNumberOfArray, this.returnRow(i), board) &&
+        this.isPossibleCol(randomNumberOfArray, this.returnCol(i), board) &&
+        this.isPossibleBlock(randomNumberOfArray, this.returnBlock(i), board)
       ) {
 
         //If no confliction use the random number
-        valueBoard[i] = [randomNumberOfArray];
+        board[i] = [randomNumberOfArray];
         let index = possibleNumberBoard[i].indexOf(randomNumberOfArray);
         if (index >= 0) {
           possibleNumberBoard[i].splice(index, 1);
@@ -444,7 +457,7 @@ class Board extends React.Component {
           possibleNumberBoard[i].splice(indexOne, 1);
         }
 
-        valueBoard[i] = 0;
+        board[i] = 0;
 
         //If it conflicts, stay
         return 0;
@@ -546,11 +559,14 @@ class Button extends React.Component {
   render() {
     return(
       <div>
-        <button id="submit" onClick={(e) => this.setState({open: true})}>
+        <button className="button" onClick={(e) => this.setState({open: true})}>
           Submit
         </button>
-        <button onClick={webReload}>
-          New Game
+        <button className="button" onClick={easy}>
+          Easy
+        </button>
+        <button className="button" onClick={hard}>
+          Hard
         </button>
         <Box open = {this.state.open} close = {(e) => this.setState({open: false})}/>
       </div>
@@ -559,8 +575,14 @@ class Button extends React.Component {
 }
 
 class App extends React.Component {
-
+  
   render() {
+
+    let newMode = localStorage.getItem("mode");
+
+    if(newMode !== mode) {
+      mode = newMode;
+    }
 
     return (
       <div className="App">

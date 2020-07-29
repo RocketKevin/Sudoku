@@ -82,7 +82,7 @@
   justify-content: center;
 }
 
-#submit {
+.button {
   margin-top: 25px;
   margin-right: 10px;
 }
@@ -149,6 +149,10 @@
 
 .zero {
   background: lightgray;
+}
+
+#easy {
+  margin-left: 10px;
 }
 
 @keyframes App-logo-spin {
