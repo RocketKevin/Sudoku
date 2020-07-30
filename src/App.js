@@ -112,11 +112,9 @@ function verifySolution() {
 
   for (var index = 0; index < 9; index++) {
     let verifyColBox = verifyCol(index, colSet, rowSet);
-    let verifyRowBox = verifyRow(index, rowSet);
-    console.log("index: " + index + ", verifyRowBox: " + verifyRowBox);
-    
+    let verifyRowBox = verifyRow(index, rowSet);    
     let verifySubgridBox = verifySubgrid(index, colSet);
-    console.log("verifyColBox: " + verifyColBox + ", verifyRowBox: " + verifyRowBox +  ", verifySubgridBox: " + verifySubgridBox);
+
     colSet.clear();
     rowSet.clear();
     if (verifyRowBox === false || verifyColBox === false || verifySubgridBox === false) {
@@ -128,14 +126,21 @@ function verifySolution() {
 }
 
 function stateOfWorld() {
-  for(let i = 0; i < 81; i++) {
-    valueBoard[i] = document.getElementById(i).value;
+  if(document.readyState === "complete") {
+    for(let i = 0; i < 81; i++) {
+      valueBoard[i] = document.getElementById(i).value;
+    }
+    console.log("True");
   }
 
   if(verifySolution() === true) {
-    alert("You Win!");
+    return true;
   }
-  console.log(valueBoard);
+  return false;
+}
+
+function webReload() {
+  window.location.reload();
 }
 
 //Making individual squares
@@ -191,135 +196,9 @@ class Square extends React.Component {
         onChange={event => this.setState({ inputValue: event.target.value.replace(/\D/, '') })}
       >
       </input>
-
     );
   }
 }
-
-/**
- * This function checks the solutions for the specified row.
- * A row is valid if there's 9 values and all numbers 1-9 are present.
- *
- * @returns boolean, true if valid row, false otherwise
- * @param {*} rowToVerify, an integer number
- * @param {*} board, board is a 1D array representing Sudoku board
- */
-function isRowComplete(rowToVerify, board) {
-  let numCol = 9;
-  let maxSudokuValue = 9;
-  const rowSet = new Set(); //create new set to store values of row
-
-  //add values of board into Set
-  for (let col = 0; col < numCol; col++) {
-    //board is a 1D array, so we need to get the element num
-    rowSet.add(parseInt(board[(9 * rowToVerify) + col]));
-  }
-  //should have 9 values in row
-  if (rowSet.size !== maxSudokuValue) {
-    return false;
-  }
-
-  // check if all possible values 1-9 are all in rowSet
-  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
-    if (rowSet.has(possibleSudokuValue) === false) {
-      return false;
-    }
-  }
-  return true; //we've check that all numbers 1-9 are in the row
-}
-
-/**
- * This function validates the solutions for the specified col.
- * A collumn is valid if there's 9 values and all numbers 1-9 are present.
- *
- * @returns boolean, true if valid col, false otherwise
- * @param {*} colToVerify, an integer number
- * @param {*} board 
- */
-function isColComplete(colToVerify, board) {
-  let numRow = 9;
-  let maxSudokuValue = 9;
-  const colSet = new Set(); //create new set to store values of col
-
-  //add col values of board into Set
-  for (let row = 0; row < numRow; row++) {
-    colSet.add(parseInt(board[(9 * row) + colToVerify]));
-  }
-
-  //should have 9 values in col
-  if (colSet.size != maxSudokuValue) {
-    return false;
-  }
-
-  // check if all possible values 1-9 are all in colSet
-  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
-    if (colSet.has(possibleSudokuValue) === false) {
-      return false;
-    }
-  }
-  return true; //we've check that all numbers 1-9 are in the col
-}
-
-/**
- * This function checks the solutions for the specified subgrid.
- * A subgrid is valid if there's 9 values and all numbers 1-9 are present.
- * Subgrids are numbered as follows
- *
- * 0 1 2
- * 3 4 5
- * 6 7 8
- *
- * @returns boolean, true if valid subgrid, false otherwise.
- * @param {*} subgridToVerify integer number
- * @param {*} board 1D array representing Sudoku board
- */
-function isSubgridComplete(subgridToVerify, board) {
-  const subgridSet = new Set(); //set to store values in the suggrid
-  let rowStartingPoint = Math.floor(subgridToVerify / 3) * 3; //using integer division
-  let colStartingPoint = (subgridToVerify % 3) * 3;
-
-  //iterate through all values of the subgrid and add them to the set
-  for (let row = rowStartingPoint; row < 3 + rowStartingPoint; row++) {
-    for (let col = colStartingPoint; col < 3 + colStartingPoint; col++) {
-      subgridSet.add(parseInt(board[(9 * row) + col]));
-    }
-  }
-
-  //check that there's 9 values in the subgrid
-  let maxSudokuValue = 9;
-  if (subgridSet.size != maxSudokuValue) {
-    return false;
-  }
-
-  // check if all possible values 1-9 are all in subgridSet
-  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
-    if (subgridSet.has(possibleSudokuValue) === false) {
-      return false;
-    }
-  }
-  return true; //we've check that all numbers 1-9 are in the subgridSet
-}
-
-/**
- * This function checks if the board in the parameter is a valid solution
- * by checking whether all rows, collumn, and subgrid are valid. A component
- * is valid if it follows all Sudoku mechanics
- *
- * @returns boolean, false if the board violates any Sudoku mechanics,
- * true otherwise
- * @param {*} board, 1D array representing Sudoku board
- */
-function isSolutionComplete(board) {
-  for (let index = 0; index < 9; index++) {
-    //verifying each smaller section of the board
-    if (isRowComplete(index, board) === false || isColComplete(index, board) === false
-      || isSubgridComplete(index, board) === false) {
-      return false;
-    }
-  }
-  return true;
-}
-
 
 class Board extends React.Component {
   
@@ -422,7 +301,7 @@ class Board extends React.Component {
       }
 
       positionAndAllPossibleNumbers.push([backup[i], oneSetOfPossibleNumbers]);
-      
+
       oneSetOfPossibleNumbers = [];
     }
     return positionAndAllPossibleNumbers;
@@ -441,6 +320,7 @@ class Board extends React.Component {
     return allPossibleNumbers;
   }
 
+  //Temperary
   cheapSolver(valueBoard) {
     let tempBoard = [];
     let possibleNumbers = [];
@@ -472,7 +352,6 @@ class Board extends React.Component {
     return true;
   }
 
-  /* In Progress */
   isUnique(valueBoard, possibleNumber) {
     //console.log(possibleNumber[2]);
     for(let i = 0; i < possibleNumber.length; i++) {
@@ -504,12 +383,9 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    while(index < 15) {
+    while(index < 30) {
       //Remove number and obtain it's value and position
-
       backup = this.removeRandomNumber(valueBoard);
-      
-      console.log(backup);
       //Find all possible answers for each cell
       possibleNumbers = this.getPossibleNumberInEmptySquares(valueBoard, backup);
       //Check unique 
@@ -592,7 +468,7 @@ class Board extends React.Component {
 
     let index = 0;
 
-    while (index < 81) {
+    while(index < 81) {
 
       //Get new postion of index
       let position = this.positionGenerator(index, possibleNumberBoard, valueBoard);
@@ -625,18 +501,59 @@ class Board extends React.Component {
       <div className="gameBoard">
         {board}
       </div>
-
     );
   }
 }
 
-class Submit extends React.Component {
-  
+class Box extends React.Component {
+  render() {
+
+    let text = "Something isn't right. Keep going!";
+
+    if(stateOfWorld()) {
+      text = "You Win";
+    }
+
+    let box = (
+      <div id="dialog">
+        <div>
+          {text}
+        </div>
+        <button id="close" onClick = {this.props.close}>
+          Close
+        </button>
+      </div>
+    );
+
+    if(!this.props.open) {
+      box = null;
+    }
+
+    return(
+      <div>
+        {box}
+      </div>
+    );
+  }
+}
+
+class Button extends React.Component {
+
+  state = {
+    open: false
+  }
+
   render() {
     return(
-      <button id="submit" onClick={stateOfWorld}>
-        Submit
-      </button>
+      <div>
+        <button id="submit" onClick={(e) => this.setState({open: true})}>
+          Submit
+        </button>
+        <button onClick={webReload}>
+          New Game
+        </button>
+        <Box open = {this.state.open} close = {(e) => this.setState({open: false})}/>
+      </div>
     )
   }
 }
@@ -655,9 +572,9 @@ class App extends React.Component {
         <div className="game-board">
           <Board />
         </div>
-      
+
         <div>
-          <Submit />
+          <Button />
         </div>
 
       </div>
