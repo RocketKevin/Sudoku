@@ -158,6 +158,12 @@ function hard() {
   window.location.reload();
 }
 
+function newGame() {
+  var nowMode = mode;
+  localStorage.setItem("mode", nowMode);
+  window.location.reload();
+}
+
 function generate() {
   if(document.readyState === "complete") {
     let selectMenu = document.getElementById("selectMenu");
@@ -603,7 +609,10 @@ class Button extends React.Component {
           Submit
         </button>
         <button className="button" onClick={(e) => this.setState({openNewGame: true})}>
-          New Game
+          New Mode
+        </button>
+        <button className="button" onClick={newGame}>
+          New Board (Same Mode)
         </button>
         <Box 
           openSubmit = {this.state.openSubmit} 
