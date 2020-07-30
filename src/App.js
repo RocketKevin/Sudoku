@@ -3,7 +3,7 @@ import './App.css';
 
 //Holds one true value
 let valueBoard = [];
-let mode = "easy";
+let difficultyValue = 46;
 
 /*
 * This method checks the solutions for the specified row. 
@@ -141,26 +141,22 @@ function stateOfWorld() {
 }
 
 function easy() {
-  var mode = "easy";
-  localStorage.setItem("mode", mode);
+  localStorage.setItem("difficultyValue", 15);
   window.location.reload();
 }
 
 function medium() {
-  var mode = "medium";
-  localStorage.setItem("mode", mode);
+  localStorage.setItem("difficultyValue", 30);
   window.location.reload();
 }
 
 function hard() {
-  var mode = "hard";
-  localStorage.setItem("mode", mode);
+  localStorage.setItem("difficultyValue", 46);
   window.location.reload();
 }
 
 function newGame() {
-  var nowMode = mode;
-  localStorage.setItem("mode", nowMode);
+  localStorage.setItem("difficultyValue", difficultyValue);
   window.location.reload();
 }
 
@@ -418,13 +414,8 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    let amountRemove = 46;
-    if(mode === "easy") {
-      amountRemove = 15;
-    } else if(mode === "medium") {
-      amountRemove = 30;
-    }
-    while(index < amountRemove) {
+    difficultyValue = localStorage.getItem("difficultyValue");
+    while(index < difficultyValue) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(board);
       //Find all possible answers for each cell
@@ -628,13 +619,6 @@ class Button extends React.Component {
 class App extends React.Component {
   
   render() {
-
-    let newMode = localStorage.getItem("mode");
-
-    if(newMode !== mode) {
-      mode = newMode;
-    }
-
     return (
       <div className="App">
 
