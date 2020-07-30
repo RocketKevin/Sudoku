@@ -167,12 +167,12 @@ function newGame() {
 function generate() {
   if(document.readyState === "complete") {
     let selectMenu = document.getElementById("selectMenu");
-    let modeVal = selectMenu.options[selectMenu.selectedIndex].value;
-    if(parseInt(modeVal) === 1) {
+    let modeVal = selectMenu.options[selectMenu.selectedIndex].text;
+    if(modeVal === "Easy") {
       easy();
-    } else if(parseInt(modeVal) === 2) {
+    } else if(modeVal === "Medium") {
       medium();
-    } else if(parseInt(modeVal) === 3) {
+    } else if(modeVal === "Hard") {
       hard();
     }
   }
