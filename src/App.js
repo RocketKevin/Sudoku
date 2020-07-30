@@ -3,7 +3,7 @@ import './App.css';
 
 //Holds one true value
 let valueBoard = [];
-let mode = "easy";
+let difficultyValue = 46;
 
 /*
 * This method checks the solutions for the specified row. 
@@ -141,15 +141,37 @@ function stateOfWorld() {
 }
 
 function easy() {
-  var mode = "easy";
-  localStorage.setItem("mode", mode);
+  localStorage.setItem("difficultyValue", 15);
+  window.location.reload();
+}
+
+function medium() {
+  localStorage.setItem("difficultyValue", 30);
   window.location.reload();
 }
 
 function hard() {
-  var mode = "hard";
-  localStorage.setItem("mode", mode);
+  localStorage.setItem("difficultyValue", 46);
   window.location.reload();
+}
+
+function newGame() {
+  localStorage.setItem("difficultyValue", difficultyValue);
+  window.location.reload();
+}
+
+function generate() {
+  if(document.readyState === "complete") {
+    let selectMenu = document.getElementById("selectMenu");
+    let modeVal = selectMenu.options[selectMenu.selectedIndex].text;
+    if(modeVal === "Easy") {
+      easy();
+    } else if(modeVal === "Medium") {
+      medium();
+    } else if(modeVal === "Hard") {
+      hard();
+    }
+  }
 }
 
 //Making individual squares
@@ -392,11 +414,8 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    let amountRemove = 46;
-    if(mode === "easy") {
-      amountRemove = 15;
-    }
-    while(index < amountRemove) {
+    difficultyValue = localStorage.getItem("difficultyValue");
+    while(index < difficultyValue) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(board);
       //Find all possible answers for each cell
@@ -522,24 +541,41 @@ class Box extends React.Component {
   render() {
 
     let text = "Something isn't right. Keep going!";
-
-    if(stateOfWorld()) {
-      text = "You Win";
-    }
-
-    let box = (
-      <div id="dialog">
-        <div>
-          {text}
+    let box = null;
+    if(this.props.openSubmit) { 
+      if(stateOfWorld()) {
+        text = "You Win";
+      }
+  
+      box = (
+        <div id="dialog">
+          <div>
+            {text}
+          </div>
+          <button id="close" onClick = {this.props.closeSubmit}>
+            Close
+          </button>
         </div>
-        <button id="close" onClick = {this.props.close}>
-          Close
-        </button>
-      </div>
-    );
-
-    if(!this.props.open) {
-      box = null;
+      );
+    } else if(this.props.openNewGame) {
+      box = (
+        <div id="dialog">
+          <div class="custom-select">
+            <select id="selectMenu">
+              <option value="0">Select Mode:</option>
+              <option value="1">Easy</option>
+              <option value="2">Medium</option>
+              <option value="3">Hard</option>
+            </select>
+          </div>
+          <button id="close" onClick = {generate}>
+            Generate
+          </button>
+          <button id="close" onClick = {this.props.closeNewGame}>
+            Close
+          </button>
+        </div>
+      );
     }
 
     return(
@@ -553,22 +589,28 @@ class Box extends React.Component {
 class Button extends React.Component {
 
   state = {
-    open: false
+    openSubmit: false,
+    openNewGame: false
   }
 
   render() {
     return(
       <div>
-        <button className="button" onClick={(e) => this.setState({open: true})}>
+        <button className="button" onClick={(e) => this.setState({openSubmit: true})}>
           Submit
         </button>
-        <button className="button" onClick={easy}>
-          Easy
+        <button className="button" onClick={(e) => this.setState({openNewGame: true})}>
+          New Mode
         </button>
-        <button className="button" onClick={hard}>
-          Hard
+        <button className="button" onClick={newGame}>
+          New Board (Same Mode)
         </button>
-        <Box open = {this.state.open} close = {(e) => this.setState({open: false})}/>
+        <Box 
+          openSubmit = {this.state.openSubmit} 
+          closeSubmit = {(e) => this.setState({openSubmit: false})}
+          openNewGame = {this.state.openNewGame} 
+          closeNewGame = {(e) => this.setState({openNewGame: false})}
+        />
       </div>
     )
   }
@@ -577,13 +619,6 @@ class Button extends React.Component {
 class App extends React.Component {
   
   render() {
-
-    let newMode = localStorage.getItem("mode");
-
-    if(newMode !== mode) {
-      mode = newMode;
-    }
-
     return (
       <div className="App">
 
