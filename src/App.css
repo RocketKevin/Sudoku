@@ -84,7 +84,7 @@
 
 .button {
   margin-top: 25px;
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .top {
@@ -153,6 +153,13 @@
 
 #easy {
   margin-left: 10px;
+}
+
+/*the container must be positioned relative:*/
+.custom-select {
+  position: relative;
+  font-family: Arial;
+  width: 200px;
 }
 
 @keyframes App-logo-spin {
