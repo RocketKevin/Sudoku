@@ -3,7 +3,7 @@ import './App.css';
 
 //Holds one true value
 let valueBoard = [];
-let difficultyValue = 46;
+let numbersToHide = 46;
 
 /*
 * This method checks the solutions for the specified row. 
@@ -131,7 +131,6 @@ function stateOfWorld() {
     for(let i = 0; i < 81; i++) {
       valueBoard[i] = document.getElementById(i).value;
     }
-    console.log("True");
   }
 
   if(verifySolution() === true) {
@@ -141,22 +140,22 @@ function stateOfWorld() {
 }
 
 function easy() {
-  localStorage.setItem("difficultyValue", 15);
+  localStorage.setItem("numbersToHide", 15);
   window.location.reload();
 }
 
 function medium() {
-  localStorage.setItem("difficultyValue", 30);
+  localStorage.setItem("numbersToHide", 30);
   window.location.reload();
 }
 
 function hard() {
-  localStorage.setItem("difficultyValue", 46);
+  localStorage.setItem("numbersToHide", 46);
   window.location.reload();
 }
 
 function newGame() {
-  localStorage.setItem("difficultyValue", difficultyValue);
+  localStorage.setItem("numbersToHide", numbersToHide);
   window.location.reload();
 }
 
@@ -170,6 +169,8 @@ function generate() {
       medium();
     } else if(modeVal === "Hard") {
       hard();
+    } else {
+      newGame();
     }
   }
 }
@@ -414,8 +415,8 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    difficultyValue = localStorage.getItem("difficultyValue");
-    while(index < difficultyValue) {
+    numbersToHide = localStorage.getItem("numbersToHide");
+    while(index < numbersToHide) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(board);
       //Find all possible answers for each cell
@@ -557,25 +558,6 @@ class Box extends React.Component {
           </button>
         </div>
       );
-    } else if(this.props.openNewGame) {
-      box = (
-        <div id="dialog">
-          <div class="custom-select">
-            <select id="selectMenu">
-              <option value="0">Select Mode:</option>
-              <option value="1">Easy</option>
-              <option value="2">Medium</option>
-              <option value="3">Hard</option>
-            </select>
-          </div>
-          <button id="close" onClick = {generate}>
-            Generate
-          </button>
-          <button id="close" onClick = {this.props.closeNewGame}>
-            Close
-          </button>
-        </div>
-      );
     }
 
     return(
@@ -589,8 +571,7 @@ class Box extends React.Component {
 class Button extends React.Component {
 
   state = {
-    openSubmit: false,
-    openNewGame: false
+    openSubmit: false
   }
 
   render() {
@@ -599,17 +580,9 @@ class Button extends React.Component {
         <button className="button" onClick={(e) => this.setState({openSubmit: true})}>
           Submit
         </button>
-        <button className="button" onClick={(e) => this.setState({openNewGame: true})}>
-          New Mode
-        </button>
-        <button className="button" onClick={newGame}>
-          New Board (Same Mode)
-        </button>
         <Box 
           openSubmit = {this.state.openSubmit} 
           closeSubmit = {(e) => this.setState({openSubmit: false})}
-          openNewGame = {this.state.openNewGame} 
-          closeNewGame = {(e) => this.setState({openNewGame: false})}
         />
       </div>
     )
@@ -617,7 +590,6 @@ class Button extends React.Component {
 }
 
 class App extends React.Component {
-  
   render() {
     return (
       <div className="App">
@@ -625,6 +597,19 @@ class App extends React.Component {
         <h1 id="title">
           Sudoku!
         </h1>
+
+        <div id="mode">
+            <select  id="selectMenu">
+              <option value="0">Same Mode</option>
+              <option value="1">Easy</option>
+              <option value="2">Medium</option>
+              <option value="3">Hard</option>
+            </select>
+          </div>
+          <button className="button"  onClick = {generate}>
+            Generate
+          </button>
+        <div/>
 
         <div className="game-board">
           <Board />
