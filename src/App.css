@@ -83,8 +83,7 @@
 }
 
 .button {
-  margin-top: 25px;
-  margin-left: 10px;
+  margin-top: 10px;
 }
 
 .top {
@@ -160,6 +159,10 @@
   position: relative;
   font-family: Arial;
   width: 200px;
+}
+
+#mode {
+  margin-top: 10px;
 }
 
 @keyframes App-logo-spin {

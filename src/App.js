@@ -131,7 +131,6 @@ function stateOfWorld() {
     for(let i = 0; i < 81; i++) {
       valueBoard[i] = document.getElementById(i).value;
     }
-    console.log("True");
   }
 
   if(verifySolution() === true) {
@@ -170,6 +169,8 @@ function generate() {
       medium();
     } else if(modeVal === "Hard") {
       hard();
+    } else {
+      newGame();
     }
   }
 }
@@ -557,25 +558,6 @@ class Box extends React.Component {
           </button>
         </div>
       );
-    } else if(this.props.openNewGame) {
-      box = (
-        <div id="dialog">
-          <div class="custom-select">
-            <select id="selectMenu">
-              <option value="0">Select Mode:</option>
-              <option value="1">Easy</option>
-              <option value="2">Medium</option>
-              <option value="3">Hard</option>
-            </select>
-          </div>
-          <button id="close" onClick = {generate}>
-            Generate
-          </button>
-          <button id="close" onClick = {this.props.closeNewGame}>
-            Close
-          </button>
-        </div>
-      );
     }
 
     return(
@@ -589,8 +571,7 @@ class Box extends React.Component {
 class Button extends React.Component {
 
   state = {
-    openSubmit: false,
-    openNewGame: false
+    openSubmit: false
   }
 
   render() {
@@ -599,17 +580,9 @@ class Button extends React.Component {
         <button className="button" onClick={(e) => this.setState({openSubmit: true})}>
           Submit
         </button>
-        <button className="button" onClick={(e) => this.setState({openNewGame: true})}>
-          New Mode
-        </button>
-        <button className="button" onClick={newGame}>
-          New Board (Same Mode)
-        </button>
         <Box 
           openSubmit = {this.state.openSubmit} 
           closeSubmit = {(e) => this.setState({openSubmit: false})}
-          openNewGame = {this.state.openNewGame} 
-          closeNewGame = {(e) => this.setState({openNewGame: false})}
         />
       </div>
     )
@@ -617,7 +590,7 @@ class Button extends React.Component {
 }
 
 class App extends React.Component {
-  
+
   render() {
     return (
       <div className="App">
@@ -625,6 +598,19 @@ class App extends React.Component {
         <h1 id="title">
           Sudoku!
         </h1>
+
+        <div id="mode">
+            <select  id="selectMenu">
+              <option value="0">Same Mode</option>
+              <option value="1">Easy</option>
+              <option value="2">Medium</option>
+              <option value="3">Hard</option>
+            </select>
+          </div>
+          <button className="button"  onClick = {generate}>
+            Generate
+          </button>
+        <div/>
 
         <div className="game-board">
           <Board />
