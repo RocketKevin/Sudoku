@@ -3,7 +3,7 @@ import './App.css';
 
 //Holds one true value
 let valueBoard = [];
-let difficultyValue = 46;
+let numbersToHide = 46;
 
 /*
 * This method checks the solutions for the specified row. 
@@ -140,22 +140,22 @@ function stateOfWorld() {
 }
 
 function easy() {
-  localStorage.setItem("difficultyValue", 15);
+  localStorage.setItem("numbersToHide", 15);
   window.location.reload();
 }
 
 function medium() {
-  localStorage.setItem("difficultyValue", 30);
+  localStorage.setItem("numbersToHide", 30);
   window.location.reload();
 }
 
 function hard() {
-  localStorage.setItem("difficultyValue", 46);
+  localStorage.setItem("numbersToHide", 46);
   window.location.reload();
 }
 
 function newGame() {
-  localStorage.setItem("difficultyValue", difficultyValue);
+  localStorage.setItem("numbersToHide", numbersToHide);
   window.location.reload();
 }
 
@@ -415,8 +415,8 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    difficultyValue = localStorage.getItem("difficultyValue");
-    while(index < difficultyValue) {
+    numbersToHide = localStorage.getItem("numbersToHide");
+    while(index < numbersToHide) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(board);
       //Find all possible answers for each cell
