@@ -91,13 +91,13 @@ function isSubgridComplete(subgridToVerify) {
   }
 
   let maxSudokuValue = 9;
-  if (colSet.size !== maxSudokuValue) {
+  if (subgridSet.size !== maxSudokuValue) {
     return false;
   }
 
   // check if all possible values 1-9 are all in colSet
   for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (colSet.has(possibleSudoKuValue) === false) {
+    if (subgridSet.has(possibleSudoKuValue) === false) {
       return false;
     }
   }
@@ -360,7 +360,8 @@ class Board extends React.Component {
     const emptySquaresList = [];
 
     for (let index = 0; index < valueBoard.length; index++) {
-      if (valueBoard[index] == undefined) { // if the cell is empty, is it undefined or 0?
+      // if the cell is empty
+      if (valueBoard[index] === undefined || valueBoard[index] === 0) { 
         emptySquaresList.push(index);
       }
     }
@@ -402,7 +403,7 @@ class Board extends React.Component {
     for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
       for (let colIndex = 0; colIndex < 9; colIndex++) {
         /*if empty square, set markers here*/
-        if (valueBoard[(row * 9) + col] == 0 || valueBoard[(row * 9) + col] == undefined) { 
+        if (valueBoard[(row * 9) + col] === 0 || valueBoard[(row * 9) + col] === undefined) { 
           row = rowIndex;
           col = colIndex;
 
@@ -411,13 +412,13 @@ class Board extends React.Component {
 
         }
       }
-      if (finishProcessing == false) {
+      if (finishProcessing === false) {
         break; /*done searching for empty cell, break out of row loop*/
       }
     }
 
     /*no more empty spaces left, we've solved the board */
-    if (finishProcessing == true) {
+    if (finishProcessing === true) {
       return true;
     }
 
