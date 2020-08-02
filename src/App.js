@@ -415,7 +415,13 @@ class Board extends React.Component {
     let backup = [];
     let possibleNumbers = [];
     let index = 0;
-    numbersToHide = localStorage.getItem("numbersToHide");
+    if(parseInt(localStorage.getItem("numbersToHide")) === 46 || 
+       parseInt(localStorage.getItem("numbersToHide")) === 15 ||
+       parseInt(localStorage.getItem("numbersToHide")) === 30
+    ) {
+      console.log("True");
+      numbersToHide = localStorage.getItem("numbersToHide");
+    }
     while(index < numbersToHide) {
       //Remove number and obtain it's value and position
       backup = this.removeRandomNumber(board);
@@ -541,11 +547,18 @@ class Board extends React.Component {
 class Box extends React.Component {
   render() {
 
-    let text = "Something isn't right. Keep going!";
+    let text = "Something isn't right. Check your work!";
+
     let box = null;
     if(this.props.openSubmit) { 
       if(stateOfWorld()) {
         text = "You Win";
+      } else {
+        for(let i = 0; i < 81; i++) {
+          if(valueBoard[i] === '') {
+            text = "Please fill in the rest of the numbers!";
+          } 
+        }
       }
   
       box = (
