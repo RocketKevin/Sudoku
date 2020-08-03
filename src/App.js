@@ -5,18 +5,19 @@ import './App.css';
 let valueBoard = [];
 let numbersToHide = 46;
 
-/*
-* This method checks the solutions for the specified row. 
-* Returns true if valid row, false otherwise
-*
-* @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
-*/
-function verifyRow(rowToVerify, rowSet) {
-  var numCol = 9;
-  var maxSudokuValue = 9;
-  // console.log("True");
-  //add values of board into Set
-  for (var col = 0; col < numCol; col++) {
+/**
+ * This function checks the solutions for the specified row.
+ * A row is valid if there's 9 values and all numbers 1-9 are present.
+ *
+ * @returns boolean, true if valid row, false otherwise
+ * @param {*} rowToVerify, an integer number
+ * @param {*} board, board is a 1D array representing Sudoku board
+ */
+function isRowComplete(rowToVerify) {
+  let numCol = 9;
+  let maxSudokuValue = 9;
+  const rowSet = new Set();
+  for (let col = 0; col < numCol; col++) {
     rowSet.add(parseInt(valueBoard[rowToVerify * 9 + col]));
   }
 
@@ -26,7 +27,7 @@ function verifyRow(rowToVerify, rowSet) {
   }
 
   // check if all possible values 1-9 are all in rowSet
-  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+  for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
     if (rowSet.has(possibleSudoKuValue) === false) {
       return false;
     }
@@ -34,18 +35,19 @@ function verifyRow(rowToVerify, rowSet) {
   return true; //we've check that all numbers 1-9 are in the row
 }
 
-/*
-* This method checks the solutions for the specified col. 
-* Returns true if valid col, false otherwise
-*
-* @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
-*/
-function verifyCol(colToVerify, colSet) {
-  var numRow = 9;
-  var maxSudokuValue = 9;
-  // console.log("True");
-  //add values of board into Set
-  for (var row = 0; row < numRow; row++) {
+/**
+ * This function validates the solutions for the specified col.
+ * A collumn is valid if there's 9 values and all numbers 1-9 are present.
+ *
+ * @returns boolean, true if valid col, false otherwise
+ * @param {*} colToVerify, an integer number
+ * @param {*} board
+ */
+function isColComplete(colToVerify) {
+  let numRow = 9;
+  let maxSudokuValue = 9;
+  const colSet = new Set();
+  for (let row = 0; row < numRow; row++) {
     colSet.add(parseInt(valueBoard[row * 9 + colToVerify]));
   }
 
@@ -55,7 +57,7 @@ function verifyCol(colToVerify, colSet) {
   }
 
   // check if all possible values 1-9 are all in colSet
-  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
+  for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
     if (colSet.has(possibleSudoKuValue) === false) {
       return false;
     }
@@ -63,36 +65,39 @@ function verifyCol(colToVerify, colSet) {
   return true; //we've check that all numbers 1-9 are in the col
 }
 
-/*
-* This method checks the solutions for the specified subgrid. 
-* Returns true if valid subgrid, false otherwise. Subgrids are numbered
-* 
-* 0 1 2
-* 3 4 5
-* 6 7 8
-*
-* @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
-*/
-function verifySubgrid(subgridToVerify, colSet) {
-  let subgridSet = new Set();
-  var colStartingPoint = (subgridToVerify % 3) * 3;
-  var rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
+/**
+ * This function checks the solutions for the specified subgrid.
+ * A subgrid is valid if there's 9 values and all numbers 1-9 are present.
+ * Subgrids are numbered as follows
+ *
+ * 0 1 2
+ * 3 4 5
+ * 6 7 8
+ *
+ * @returns boolean, true if valid subgrid, false otherwise.
+ * @param {*} subgridToVerify integer number
+ * @param {*} board 1D array representing Sudoku board
+ */
+function isSubgridComplete(subgridToVerify) {
+  const subgridSet = new Set();
+  let colStartingPoint = (subgridToVerify % 3) * 3;
+  let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
   //subgrid for first row
 
-  for (var row = (rowStartingPoint*3); row < 3 + (rowStartingPoint*3); row++) {
-    for (var col = colStartingPoint; col < 3 + colStartingPoint; col++) {
+  for (let row = (rowStartingPoint*3); row < 3 + (rowStartingPoint*3); row++) {
+    for (let col = colStartingPoint; col < 3 + colStartingPoint; col++) {
       subgridSet.add(parseInt(valueBoard[row * 9 + col]));
     }
   }
 
-  var maxSudokuValue = 9;
-  if (colSet.size !== maxSudokuValue) {
+  let maxSudokuValue = 9;
+  if (subgridSet.size !== maxSudokuValue) {
     return false;
   }
 
   // check if all possible values 1-9 are all in colSet
-  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (colSet.has(possibleSudoKuValue) === false) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
+    if (subgridSet.has(possibleSudokuValue) === false) {
       return false;
     }
   }
@@ -100,29 +105,25 @@ function verifySubgrid(subgridToVerify, colSet) {
   
 }
 
-/*
-* This method checks if the board in the parameter is a valid solution
-* by checking whether each row, collumn, and subgrid are valid.
-* Method returns false if the board violates any Sudoku mechanics, 
-* true otherwise. 
-*/
-function verifySolution() {
-  
-  let colSet = new Set(); //create new set to store values of col
-  let rowSet = new Set(); //create new set to store values of row
+/**
+ * This function checks if the board in the parameter is a valid solution
+ * by checking whether all rows, collumn, and subgrid are valid. A component
+ * is valid if it follows all Sudoku mechanics
+ *
+ * @returns boolean, false if the board violates any Sudoku mechanics,
+ * true otherwise
+ * @param {*} board, 1D array representing Sudoku board
+ */
+function isSolutionCorrect() {
+  let numSubsections = 9
 
-  for (var index = 0; index < 9; index++) {
-    let verifyColBox = verifyCol(index, colSet, rowSet);
-    let verifyRowBox = verifyRow(index, rowSet);    
-    let verifySubgridBox = verifySubgrid(index, colSet);
-
-    colSet.clear();
-    rowSet.clear();
-    if (verifyRowBox === false || verifyColBox === false || verifySubgridBox === false) {
+  for (let index = 0; index < numSubsections; index++) {
+    //verifying each smaller section of the board
+    if (isRowComplete(index, board) === false || isColComplete(index, board) === false
+      || isSubgridComplete(index, board) === false) {
       return false;
     }
   }
-
   return true;
 }
 
@@ -133,7 +134,7 @@ function stateOfWorld() {
     }
   }
 
-  if(verifySolution() === true) {
+  if(isSolutionCorrect() === true) {
     return true;
   }
   return false;
