@@ -27,8 +27,8 @@ function isRowComplete(rowToVerify) {
   }
 
   // check if all possible values 1-9 are all in rowSet
-  for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (rowSet.has(possibleSudoKuValue) === false) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
+    if (rowSet.has(possibleSudokuValue) === false) {
       return false;
     }
   }
@@ -57,8 +57,8 @@ function isColComplete(colToVerify) {
   }
 
   // check if all possible values 1-9 are all in colSet
-  for (let possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (colSet.has(possibleSudoKuValue) === false) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
+    if (colSet.has(possibleSudokuValue) === false) {
       return false;
     }
   }
@@ -96,7 +96,8 @@ function isSubgridComplete(subgridToVerify) {
   }
 
   // check if all possible values 1-9 are all in colSet
-  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue;
+      possibleSudokuValue++) {
     if (subgridSet.has(possibleSudokuValue) === false) {
       return false;
     }
@@ -106,28 +107,33 @@ function isSubgridComplete(subgridToVerify) {
 }
 
 /**
- * This function checks if the board in the parameter is a valid solution
+ * This function checks if valueBoard is a valid solution
  * by checking whether all rows, collumn, and subgrid are valid. A component
  * is valid if it follows all Sudoku mechanics
  *
  * @returns boolean, false if the board violates any Sudoku mechanics,
  * true otherwise
- * @param {*} board, 1D array representing Sudoku board
  */
 function isSolutionCorrect() {
   let numSubsections = 9
-
   for (let index = 0; index < numSubsections; index++) {
     //verifying each smaller section of the board
-    if (isRowComplete(index, board) === false || isColComplete(index, board) === false
-      || isSubgridComplete(index, board) === false) {
+    if (isRowComplete(index) === false || isColComplete(index) === false
+      || isSubgridComplete(index) === false) {
       return false;
     }
   }
   return true;
 }
 
-function stateOfWorld() {
+/**
+ * This function checks if the board in the current window is a valid solution
+ * by calling isSolutionCorrect()
+ *
+ * @returns boolean, false if the solution violates any Sudoku mechanics,
+ * true otherwise
+ */
+function isValidSolution() {
   if(document.readyState === "complete") {
     for(let i = 0; i < 81; i++) {
       valueBoard[i] = document.getElementById(i).value;
@@ -140,16 +146,31 @@ function stateOfWorld() {
   return false;
 }
 
+/**
+ * This function sets up/reloads the game as "easy",
+ * by having the player solve 15 squares, which means 
+ * there's 66 "permanent" numbers
+ */
 function easy() {
   localStorage.setItem("numbersToHide", 15);
   window.location.reload();
 }
 
+/**
+ * This function sets up/reloads the game as "medium",
+ * by having the player solve 30 squares, which means
+ * there's 51 "permanent" numbers
+ */
 function medium() {
   localStorage.setItem("numbersToHide", 30);
   window.location.reload();
 }
 
+/**
+ * This function sets up/reloads the game as "hard",
+ * by having the player solve 46 squares, which means
+ * there's 51 "permanent" numbers
+ */
 function hard() {
   localStorage.setItem("numbersToHide", 46);
   window.location.reload();
@@ -159,6 +180,7 @@ function newGame() {
   localStorage.setItem("numbersToHide", numbersToHide);
   window.location.reload();
 }
+
 
 function generate() {
   if(document.readyState === "complete") {
@@ -539,13 +561,13 @@ class Board extends React.Component {
   }
 }
 
-class Box extends React.Component {
+class DialogueBox extends React.Component {
   render() {
 
     let text = "Something isn't right. Keep going!";
     let box = null;
     if(this.props.openSubmit) { 
-      if(stateOfWorld()) {
+      if(isValidSolution()) {
         text = "You Win";
       }
   
@@ -581,7 +603,7 @@ class Button extends React.Component {
         <button className="button" onClick={(e) => this.setState({openSubmit: true})}>
           Submit
         </button>
-        <Box 
+        <DialogueBox 
           openSubmit = {this.state.openSubmit} 
           closeSubmit = {(e) => this.setState({openSubmit: false})}
         />
