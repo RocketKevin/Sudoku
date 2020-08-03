@@ -169,7 +169,7 @@ function medium() {
 /**
  * This function sets up/reloads the game as "hard",
  * by having the player solve 46 squares, which means
- * there's 51 "permanent" numbers
+ * there's 35 "permanent" numbers
  */
 function hard() {
   localStorage.setItem("numbersToHide", 46);
@@ -443,6 +443,7 @@ class Board extends React.Component {
     return true;
   }
 
+  /*
   //Temperary
   cheapSolver(valueBoard) {
     let tempBoard = [];
@@ -474,6 +475,7 @@ class Board extends React.Component {
     }
     return true;
   }
+  */
 
   isUnique(board, possibleNumber) {
     //console.log(possibleNumber[2]);
