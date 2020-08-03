@@ -82,7 +82,6 @@ function isSubgridComplete(subgridToVerify) {
   const subgridSet = new Set();
   let colStartingPoint = (subgridToVerify % 3) * 3;
   let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
-  //subgrid for first row
 
   for (let row = (rowStartingPoint*3); row < 3 + (rowStartingPoint*3); row++) {
     for (let col = colStartingPoint; col < 3 + colStartingPoint; col++) {
@@ -168,11 +167,11 @@ function medium() {
 
 /**
  * This function sets up/reloads the game as "hard",
- * by having the player solve 46 squares, which means
- * there's 35 "permanent" numbers
+ * by having the player solve 40 squares, which means
+ * there's 41 "permanent" numbers
  */
 function hard() {
-  localStorage.setItem("numbersToHide", 46);
+  localStorage.setItem("numbersToHide", 40);
   window.location.reload();
 }
 
@@ -393,58 +392,148 @@ class Board extends React.Component {
    * 6. continue until there are no more empty squares
    * 
    * @returns boolean, true is there exists a solution, false otherwise
-   * @param {*} valueBoard 
+   * @param {*} board, 1D array representing gameboard 
    */
-  solve(valueBoard) {
+  solve(board) {
+    /*add all empty squares to stackToProcess */
     const stackToProcess = [];
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
-        if (valueBoard === 0) {
+        if (board[(row * 9) + col] === 0) {
+          /*pushing square ID of empty square */
           stackToProcess.push((row * 9) + col);
+          console.log("pushing " + ((row * 9) + col) + " to stackToProcess");
         }
       }
     }
 
+    console.log("the length of stackToProcess is: " + stackToProcess.length);
+    /* if no more squares to process, then Sudoku board is solved*/
     if (stackToProcess.length === 0) {
       return true;
     }
-    let firstIndex = stackToProcess[0];
-    let row = firstIndex / 9;
-    let col = firstIndex % 9;
 
+    let firstIndex = stackToProcess[0];
+    let row = Math.floor(firstIndex / 9);
+    let col = Math.floor(firstIndex / 9);
+
+    /*plugging in numbers to solve */
     for (let index = 1; index <= 9; index++) {
-      if (this.isSafeToAdd(valueBoard, row, col, index)) {
-        valueBoard[(9 * row) + col] = index;
+      if (this.isSafeToAdd(board, row, col, index)) {
+        board[(9 * row) + col] = index;
         stackToProcess.pop();
+        console.log("the length of stackToProcess is: " + stackToProcess.length);
+        
         if (stackToProcess.length === 0) {
           return true;
         }
-        valueBoard[(9 * row) + col] = 0
-        stackToProcess.push(firstIndex);
       }
+      /*no numbers between 1-9 were safe to add, square need to process*/
+      board[(9 * row) + col] = 0
+      stackToProcess.push(firstIndex);
+      console.log("the length of stackToProcess is: " + stackToProcess.length);
     }
+    return false; /*return false if board is not solveable */
   }
   
   /**
-   * This helper method checks if a number is safe to add
-   * in the board parameter in the specified row and column
+   * This method checks if a number is safe to add
+   * in the board parameter in the specified row and column.
+   * The method will check if it's safe to add in the row, column,
+   * and subgrid
    * 
+   * @returns boolean true if safe to add, false otherwise
    * @param {*} board, 1D array that represents Sudoku board to check
-   * @param {*} row, row to add number 
-   * @param {*} col, col to add number
+   * @param {*} row, row on board to add number 
+   * @param {*} col, col on board to add number
    * @param {*} numToAdd, number we want to add
    */
   isSafeToAdd(board, row, col, numToAdd) {
-    if ((this.isPossibleBlock(numToAdd, (row * 9) + col, board)
-        || this.isPossibleRow(numToAdd, row, board)
-        || this.isPossibleCol(numToAdd, col, board)) === false) {
+    if ((this.isSafeToAddSubgrid(board, row, col, numToAdd)
+      || this.isSafeToAddRow(board, row, numToAdd)
+      || this.isSafeToAddCol(board, row, numToAdd)) === false) {
       return false;
     }
     return true;
   }
 
-  /*
-  //Temperary
+  /**
+   * This method checks if a number is safe to add in a row.
+   * A number is safe to add if there isn't already that number in
+   * the specified row.
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} row, row on board to add number
+   * @param {*} numToAdd, number we want to add to board
+   */
+  isSafeToAddRow(board, row, numToAdd) {
+    let numCols = 9;
+    const rowSet = new Set();
+
+    for (let col = 0; col < numCols; col++) {
+      rowSet.add(parseInt(board[(row * 9) + col]));
+    }
+
+    if (rowSet.has(numToAdd) === false) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method checks if a number is safe to add in a column.
+   * A number is safe to add if there isn't already that number in
+   * the specified column.
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} col, column on board to add number
+   * @param {*} numToAdd, number we want to add to board 
+   */
+  isSafeToAddCol(board, col, numToAdd) {
+    let numRows = 9;
+    const colSet = new Set();
+
+    for (let row = 0; row < numRows; row++) {
+      colSet.add(parseInt(board[(row * 9) + col]));
+    }
+
+    if (colSet.has(numToAdd) === false) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method checks if a number is safe to add in a subgrid.
+   * A number is safe to add if there isn't already that number in
+   * the specified subgrid.
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} row, row on board to add number 
+   * @param {*} col, col on board to add number
+   * @param {*} numToAdd, number we want to add
+   */
+  isSafeToAddSubgrid(board, row, col, numToAdd) {
+    const subgridSet = new Set();
+    let rowStartingPoint = Math.floor(row / 3) * 3;
+    let colStartingPoint = Math.floor(col / 3) * 3;
+
+    for (let rowIndex = colStartingPoint; rowIndex < (3 + rowStartingPoint); rowIndex++) {
+      for (let colIndex = colStartingPoint; colIndex < (3 + colStartingPoint); colIndex++) {
+        subgridSet.add(parseInt(board[(rowIndex * 9) + colIndex]));
+      }
+    }
+
+    if (subgridSet.has(numToAdd) === false) {
+      return false;
+    }
+    return true;
+  }
+  
+  //Temporary
   cheapSolver(valueBoard) {
     let tempBoard = [];
     let possibleNumbers = [];
@@ -475,7 +564,7 @@ class Board extends React.Component {
     }
     return true;
   }
-  */
+  
 
   isUnique(board, possibleNumber) {
     //console.log(possibleNumber[2]);
