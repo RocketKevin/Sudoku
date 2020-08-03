@@ -375,6 +375,74 @@ class Board extends React.Component {
     return allPossibleNumbers;
   }
 
+  /**
+   * This method finds the solution to an unsolved Sudoku board
+   * using a depth first search algorithm
+   *
+   * 1. find index of an empty square
+   *
+   * 2. determine which values for the current square are possible
+   * (check row, col, subgrid)
+   *
+   * 3. iterate through possible values
+   *
+   * 4. set value of square to first possible balue
+   *
+   * 5. recursively repeat step 2 for the next empty squares
+   *
+   * 6. continue until there are no more empty squares
+   * 
+   * @returns boolean, true is there exists a solution, false otherwise
+   * @param {*} valueBoard 
+   */
+  solve(valueBoard) {
+    const stackToProcess = [];
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (valueBoard === 0) {
+          stackToProcess.push((row * 9) + col);
+        }
+      }
+    }
+
+    if (stackToProcess.length === 0) {
+      return true;
+    }
+    let firstIndex = stackToProcess[0];
+    let row = firstIndex / 9;
+    let col = firstIndex % 9;
+
+    for (let index = 1; index <= 9; index++) {
+      if (this.isSafeToAdd(valueBoard, row, col, index)) {
+        valueBoard[(9 * row) + col] = index;
+        stackToProcess.pop();
+        if (stackToProcess.length === 0) {
+          return true;
+        }
+        valueBoard[(9 * row) + col] = 0
+        stackToProcess.push(firstIndex);
+      }
+    }
+  }
+  
+  /**
+   * This helper method checks if a number is safe to add
+   * in the board parameter in the specified row and column
+   * 
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} row, row to add number 
+   * @param {*} col, col to add number
+   * @param {*} numToAdd, number we want to add
+   */
+  isSafeToAdd(board, row, col, numToAdd) {
+    if ((this.isPossibleBlock(numToAdd, (row * 9) + col, board)
+        || this.isPossibleRow(numToAdd, row, board)
+        || this.isPossibleCol(numToAdd, col, board)) === false) {
+      return false;
+    }
+    return true;
+  }
+
   //Temperary
   cheapSolver(valueBoard) {
     let tempBoard = [];
@@ -417,7 +485,7 @@ class Board extends React.Component {
               board[possibleNumber[i][0]] = possibleNumber[i][1][j];
               
               
-              if(this.cheapSolver(board)) {
+              if(this.solve(board)) {
                 board[possibleNumber[i][0]] = 0;
                 return false;
               }
