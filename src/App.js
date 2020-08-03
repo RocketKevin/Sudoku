@@ -5,18 +5,19 @@ import './App.css';
 let valueBoard = [];
 let numbersToHide = 46;
 
-/*
-* This method checks the solutions for the specified row. 
-* Returns true if valid row, false otherwise
-*
-* @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
-*/
-function verifyRow(rowToVerify, rowSet) {
-  var numCol = 9;
-  var maxSudokuValue = 9;
-  // console.log("True");
-  //add values of board into Set
-  for (var col = 0; col < numCol; col++) {
+/**
+ * This function checks the solutions for the specified row.
+ * A row is valid if there's 9 values and all numbers 1-9 are present.
+ *
+ * @returns boolean, true if valid row, false otherwise
+ * @param {*} rowToVerify, an integer number
+ * @param {*} board, board is a 1D array representing Sudoku board
+ */
+function isRowComplete(rowToVerify) {
+  let numCol = 9;
+  let maxSudokuValue = 9;
+  const rowSet = new Set();
+  for (let col = 0; col < numCol; col++) {
     rowSet.add(parseInt(valueBoard[rowToVerify * 9 + col]));
   }
 
@@ -26,26 +27,27 @@ function verifyRow(rowToVerify, rowSet) {
   }
 
   // check if all possible values 1-9 are all in rowSet
-  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (rowSet.has(possibleSudoKuValue) === false) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
+    if (rowSet.has(possibleSudokuValue) === false) {
       return false;
     }
   }
   return true; //we've check that all numbers 1-9 are in the row
 }
 
-/*
-* This method checks the solutions for the specified col. 
-* Returns true if valid col, false otherwise
-*
-* @param rowToVerify is an integer number, board is a 2D array representing Sudoku board
-*/
-function verifyCol(colToVerify, colSet) {
-  var numRow = 9;
-  var maxSudokuValue = 9;
-  // console.log("True");
-  //add values of board into Set
-  for (var row = 0; row < numRow; row++) {
+/**
+ * This function validates the solutions for the specified col.
+ * A collumn is valid if there's 9 values and all numbers 1-9 are present.
+ *
+ * @returns boolean, true if valid col, false otherwise
+ * @param {*} colToVerify, an integer number
+ * @param {*} board
+ */
+function isColComplete(colToVerify) {
+  let numRow = 9;
+  let maxSudokuValue = 9;
+  const colSet = new Set();
+  for (let row = 0; row < numRow; row++) {
     colSet.add(parseInt(valueBoard[row * 9 + colToVerify]));
   }
 
@@ -55,44 +57,47 @@ function verifyCol(colToVerify, colSet) {
   }
 
   // check if all possible values 1-9 are all in colSet
-  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (colSet.has(possibleSudoKuValue) === false) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue; possibleSudokuValue++) {
+    if (colSet.has(possibleSudokuValue) === false) {
       return false;
     }
   }
   return true; //we've check that all numbers 1-9 are in the col
 }
 
-/*
-* This method checks the solutions for the specified subgrid. 
-* Returns true if valid subgrid, false otherwise. Subgrids are numbered
-* 
-* 0 1 2
-* 3 4 5
-* 6 7 8
-*
-* @param subgridToVerify is an integer number, board is a 2D array representing Sudoku board
-*/
-function verifySubgrid(subgridToVerify, colSet) {
-  let subgridSet = new Set();
-  var colStartingPoint = (subgridToVerify % 3) * 3;
-  var rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
-  //subgrid for first row
+/**
+ * This function checks the solutions for the specified subgrid.
+ * A subgrid is valid if there's 9 values and all numbers 1-9 are present.
+ * Subgrids are numbered as follows
+ *
+ * 0 1 2
+ * 3 4 5
+ * 6 7 8
+ *
+ * @returns boolean, true if valid subgrid, false otherwise.
+ * @param {*} subgridToVerify integer number
+ * @param {*} board 1D array representing Sudoku board
+ */
+function isSubgridComplete(subgridToVerify) {
+  const subgridSet = new Set();
+  let colStartingPoint = (subgridToVerify % 3) * 3;
+  let rowStartingPoint = Math.floor(subgridToVerify / 3); //using integer division
 
-  for (var row = (rowStartingPoint*3); row < 3 + (rowStartingPoint*3); row++) {
-    for (var col = colStartingPoint; col < 3 + colStartingPoint; col++) {
+  for (let row = (rowStartingPoint*3); row < 3 + (rowStartingPoint*3); row++) {
+    for (let col = colStartingPoint; col < 3 + colStartingPoint; col++) {
       subgridSet.add(parseInt(valueBoard[row * 9 + col]));
     }
   }
 
-  var maxSudokuValue = 9;
-  if (colSet.size !== maxSudokuValue) {
+  let maxSudokuValue = 9;
+  if (subgridSet.size !== maxSudokuValue) {
     return false;
   }
 
   // check if all possible values 1-9 are all in colSet
-  for (var possibleSudoKuValue = 1; possibleSudoKuValue <= maxSudokuValue; possibleSudoKuValue++) {
-    if (colSet.has(possibleSudoKuValue) === false) {
+  for (let possibleSudokuValue = 1; possibleSudokuValue <= maxSudokuValue;
+      possibleSudokuValue++) {
+    if (subgridSet.has(possibleSudokuValue) === false) {
       return false;
     }
   }
@@ -100,57 +105,73 @@ function verifySubgrid(subgridToVerify, colSet) {
   
 }
 
-/*
-* This method checks if the board in the parameter is a valid solution
-* by checking whether each row, collumn, and subgrid are valid.
-* Method returns false if the board violates any Sudoku mechanics, 
-* true otherwise. 
-*/
-function verifySolution() {
-  
-  let colSet = new Set(); //create new set to store values of col
-  let rowSet = new Set(); //create new set to store values of row
-
-  for (var index = 0; index < 9; index++) {
-    let verifyColBox = verifyCol(index, colSet, rowSet);
-    let verifyRowBox = verifyRow(index, rowSet);    
-    let verifySubgridBox = verifySubgrid(index, colSet);
-
-    colSet.clear();
-    rowSet.clear();
-    if (verifyRowBox === false || verifyColBox === false || verifySubgridBox === false) {
+/**
+ * This function checks if valueBoard is a valid solution
+ * by checking whether all rows, collumn, and subgrid are valid. A component
+ * is valid if it follows all Sudoku mechanics
+ *
+ * @returns boolean, false if the board violates any Sudoku mechanics,
+ * true otherwise
+ */
+function isSolutionCorrect() {
+  let numSubsections = 9
+  for (let index = 0; index < numSubsections; index++) {
+    //verifying each smaller section of the board
+    if (isRowComplete(index) === false || isColComplete(index) === false
+      || isSubgridComplete(index) === false) {
       return false;
     }
   }
-
   return true;
 }
 
-function stateOfWorld() {
+/**
+ * This function checks if the board in the current window is a valid solution
+ * by calling isSolutionCorrect()
+ *
+ * @returns boolean, false if the solution violates any Sudoku mechanics,
+ * true otherwise
+ */
+function isValidSolution() {
   if(document.readyState === "complete") {
     for(let i = 0; i < 81; i++) {
       valueBoard[i] = document.getElementById(i).value;
     }
   }
 
-  if(verifySolution() === true) {
+  if(isSolutionCorrect() === true) {
     return true;
   }
   return false;
 }
 
+/**
+ * This function sets up/reloads the game as "easy",
+ * by having the player solve 15 squares, which means 
+ * there's 66 "permanent" numbers
+ */
 function easy() {
   localStorage.setItem("numbersToHide", 15);
   window.location.reload();
 }
 
+/**
+ * This function sets up/reloads the game as "medium",
+ * by having the player solve 30 squares, which means
+ * there's 51 "permanent" numbers
+ */
 function medium() {
   localStorage.setItem("numbersToHide", 30);
   window.location.reload();
 }
 
+/**
+ * This function sets up/reloads the game as "hard",
+ * by having the player solve 40 squares, which means
+ * there's 41 "permanent" numbers
+ */
 function hard() {
-  localStorage.setItem("numbersToHide", 46);
+  localStorage.setItem("numbersToHide", 40);
   window.location.reload();
 }
 
@@ -158,6 +179,7 @@ function newGame() {
   localStorage.setItem("numbersToHide", numbersToHide);
   window.location.reload();
 }
+
 
 function generate() {
   if(document.readyState === "complete") {
@@ -352,7 +374,166 @@ class Board extends React.Component {
     return allPossibleNumbers;
   }
 
-  //Temperary
+  /**
+   * This method finds the solution to an unsolved Sudoku board
+   * using a depth first search algorithm
+   *
+   * 1. find index of an empty square
+   *
+   * 2. determine which values for the current square are possible
+   * (check row, col, subgrid)
+   *
+   * 3. iterate through possible values
+   *
+   * 4. set value of square to first possible balue
+   *
+   * 5. recursively repeat step 2 for the next empty squares
+   *
+   * 6. continue until there are no more empty squares
+   * 
+   * @returns boolean, true is there exists a solution, false otherwise
+   * @param {*} board, 1D array representing gameboard 
+   */
+  solve(board) {
+    /*add all empty squares to stackToProcess */
+    const stackToProcess = [];
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (board[(row * 9) + col] === 0) {
+          /*pushing square ID of empty square */
+          stackToProcess.push((row * 9) + col);
+          console.log("pushing " + ((row * 9) + col) + " to stackToProcess");
+        }
+      }
+    }
+
+    console.log("the length of stackToProcess is: " + stackToProcess.length);
+    /* if no more squares to process, then Sudoku board is solved*/
+    if (stackToProcess.length === 0) {
+      return true;
+    }
+
+    let firstIndex = stackToProcess[0];
+    let row = Math.floor(firstIndex / 9);
+    let col = Math.floor(firstIndex / 9);
+
+    /*plugging in numbers to solve */
+    for (let index = 1; index <= 9; index++) {
+      if (this.isSafeToAdd(board, row, col, index)) {
+        board[(9 * row) + col] = index;
+        stackToProcess.pop();
+        console.log("the length of stackToProcess is: " + stackToProcess.length);
+        
+        if (stackToProcess.length === 0) {
+          return true;
+        }
+      }
+      /*no numbers between 1-9 were safe to add, square need to process*/
+      board[(9 * row) + col] = 0
+      stackToProcess.push(firstIndex);
+      console.log("the length of stackToProcess is: " + stackToProcess.length);
+    }
+    return false; /*return false if board is not solveable */
+  }
+  
+  /**
+   * This method checks if a number is safe to add
+   * in the board parameter in the specified row and column.
+   * The method will check if it's safe to add in the row, column,
+   * and subgrid
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} row, row on board to add number 
+   * @param {*} col, col on board to add number
+   * @param {*} numToAdd, number we want to add
+   */
+  isSafeToAdd(board, row, col, numToAdd) {
+    if ((this.isSafeToAddSubgrid(board, row, col, numToAdd)
+      || this.isSafeToAddRow(board, row, numToAdd)
+      || this.isSafeToAddCol(board, row, numToAdd)) === false) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method checks if a number is safe to add in a row.
+   * A number is safe to add if there isn't already that number in
+   * the specified row.
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} row, row on board to add number
+   * @param {*} numToAdd, number we want to add to board
+   */
+  isSafeToAddRow(board, row, numToAdd) {
+    let numCols = 9;
+    const rowSet = new Set();
+
+    for (let col = 0; col < numCols; col++) {
+      rowSet.add(parseInt(board[(row * 9) + col]));
+    }
+
+    if (rowSet.has(numToAdd) === false) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method checks if a number is safe to add in a column.
+   * A number is safe to add if there isn't already that number in
+   * the specified column.
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} col, column on board to add number
+   * @param {*} numToAdd, number we want to add to board 
+   */
+  isSafeToAddCol(board, col, numToAdd) {
+    let numRows = 9;
+    const colSet = new Set();
+
+    for (let row = 0; row < numRows; row++) {
+      colSet.add(parseInt(board[(row * 9) + col]));
+    }
+
+    if (colSet.has(numToAdd) === false) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method checks if a number is safe to add in a subgrid.
+   * A number is safe to add if there isn't already that number in
+   * the specified subgrid.
+   * 
+   * @returns boolean true if safe to add, false otherwise
+   * @param {*} board, 1D array that represents Sudoku board to check
+   * @param {*} row, row on board to add number 
+   * @param {*} col, col on board to add number
+   * @param {*} numToAdd, number we want to add
+   */
+  isSafeToAddSubgrid(board, row, col, numToAdd) {
+    const subgridSet = new Set();
+    let rowStartingPoint = Math.floor(row / 3) * 3;
+    let colStartingPoint = Math.floor(col / 3) * 3;
+
+    for (let rowIndex = colStartingPoint; rowIndex < (3 + rowStartingPoint); rowIndex++) {
+      for (let colIndex = colStartingPoint; colIndex < (3 + colStartingPoint); colIndex++) {
+        subgridSet.add(parseInt(board[(rowIndex * 9) + colIndex]));
+      }
+    }
+
+    if (subgridSet.has(numToAdd) === false) {
+      return false;
+    }
+    return true;
+  }
+  
+  //Temporary
   cheapSolver(valueBoard) {
     let tempBoard = [];
     let possibleNumbers = [];
@@ -383,6 +564,7 @@ class Board extends React.Component {
     }
     return true;
   }
+  
 
   isUnique(board, possibleNumber) {
     //console.log(possibleNumber[2]);
@@ -394,7 +576,7 @@ class Board extends React.Component {
               board[possibleNumber[i][0]] = possibleNumber[i][1][j];
               
               
-              if(this.cheapSolver(board)) {
+              if(this.solve(board)) {
                 board[possibleNumber[i][0]] = 0;
                 return false;
               }
@@ -538,13 +720,13 @@ class Board extends React.Component {
   }
 }
 
-class Box extends React.Component {
+class DialogueBox extends React.Component {
   render() {
 
     let text = "Something isn't right. Keep going!";
     let box = null;
     if(this.props.openSubmit) { 
-      if(stateOfWorld()) {
+      if(isValidSolution()) {
         text = "You Win";
       }
   
@@ -580,7 +762,7 @@ class Button extends React.Component {
         <button className="button" onClick={(e) => this.setState({openSubmit: true})}>
           Submit
         </button>
-        <Box 
+        <DialogueBox 
           openSubmit = {this.state.openSubmit} 
           closeSubmit = {(e) => this.setState({openSubmit: false})}
         />
